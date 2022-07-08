@@ -20,7 +20,7 @@ public class ShowOnlineCartPanel extends JPanel {
         cartPanel.setLayout(layout);
 
         JButton btnBack = new JButton("Back");
-        JButton btnBuyCart = new JButton("Buy products in cart");
+        JButton btnBuyCart = new JButton("Mua sản phẩm trong giỏ hàng");
 
         JPanel btnsPanel = new JPanel();
         btnsPanel.add(btnBack);
@@ -56,18 +56,18 @@ public class ShowOnlineCartPanel extends JPanel {
         for (Item item : OnlineSelectionScrollPane.CART) {
             JPanel subPanel = new JPanel();
             subPanel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
-            JLabel label = new JLabel(item.getName() + " (Cost: " + item.getCost() + ")",
+            JLabel label = new JLabel(item.getName() + " (Giá: " + item.getCost() + ")",
                     new ImageIcon(item.getImageAddress()), JLabel.CENTER);
 
             subPanel.add(label);
             subPanel.setMaximumSize(new Dimension(1000, 75));
             cartPanel.add(subPanel);
-            subPanel.setToolTipText("Click to remove from cart");
+            subPanel.setToolTipText("Nhấn vào đây để loại bỏ khỏi giỏ hàng");
 
             subPanel.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    int choice = JOptionPane.showConfirmDialog(null, "Remove from cart?", "Confirmation",
+                    int choice = JOptionPane.showConfirmDialog(null, "Lấy ra khỏi giỏ hàng?", "Confirmation",
                             JOptionPane.YES_NO_OPTION);
                     if (choice == JOptionPane.YES_OPTION) {
                         OnlineSelectionScrollPane.CART.remove(item);

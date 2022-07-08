@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -47,81 +48,85 @@ public class test extends JFrame {
         /**
          * Create the frame.
          */
-        public test(String productName, String imageAddress, Float cost, String quantity) {
-                JFrame dmm = new JFrame(productName);
-                dmm.setSize(500, 500);
-                dmm.setBackground(Color.red);
+        public test(String title, String imageAddress, Float cost, int quantity, int length, String director) {
 
-                JPanel panel1 = new JPanel();
-                panel1.setSize(500, 500);
+            JFrame detailFrame = new JFrame(title);
+            detailFrame.setSize(500, 500);
+            detailFrame.setBackground(Color.red);
 
-                // panel1.setBackground(Color.red);
-                panel1.setVisible(true);
+            JPanel panel = new JPanel();
+            panel.setSize(500, 500);
 
-                JLabel temJLabel;
-                try {
-                        URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
-                } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                        JOptionPane.ERROR_MESSAGE);
-                        URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
-                        temJLabel = new JLabel(productName, new ImageIcon(url), JLabel.CENTER);
-                }
+            // panel.setBackground(Color.red);
+            panel.setVisible(true);
 
-                String costText = "Rổ Giá: " + cost;
-
-                String quantityText = "per " + quantity;
-                panel1.setBorder(BorderFactory.createEtchedBorder(Color.lightGray,
-                                Color.black));
-
-                panel1.validate();
-                panel1.repaint();
-                Dimension dimension = new Dimension(5, 0);
-                dmm.getContentPane().add(Box.createRigidArea(dimension));
-                dmm.getContentPane().add(panel1);
-                panel1.setLayout(null);
+            JLabel temJLabel;
+            try {
                 URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
-                temJLabel = new JLabel(productName, new ImageIcon(url),
-                                JLabel.CENTER);
-                temJLabel.setBounds(160, 115, 144, 70);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
+                        JOptionPane.ERROR_MESSAGE);
+                URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
+                temJLabel = new JLabel(title, new ImageIcon(url), JLabel.CENTER);
+            }
 
-                JLabel imageNameLabel1 = temJLabel;
-                imageNameLabel1.setVerticalTextPosition(SwingConstants.BOTTOM);
-                imageNameLabel1.setHorizontalTextPosition(SwingConstants.CENTER);
-                imageNameLabel1.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
-                panel1.add(imageNameLabel1);
-                JLabel quantityLabel = new JLabel(quantityText);
-                quantityLabel.setBounds(160, 202, 99, 13);
-                panel1.add(quantityLabel);
-                JLabel costLabel = new JLabel(costText);
-                costLabel.setBounds(160, 271, 130, 20);
-                costLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
+            String costText = "Giá: " + cost;
+            String quantityText = "Số lượng: " + quantity;
+            String lengthText = "Độ dài: " + length;
+            String directorText = "Đạo diễn: " + director;
+            panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
 
-                panel1.add(costLabel);
+            panel.validate();
+            panel.repaint();
+            Dimension dimension = new Dimension(5, 0);
+            detailFrame.getContentPane().add(Box.createRigidArea(dimension));
+            detailFrame.getContentPane().add(panel);
+            panel.setLayout(null);
+            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
+            temJLabel = new JLabel(title, new ImageIcon(url), JLabel.CENTER);
+            temJLabel.setBounds(157, 107, 144, 70);
 
-                JButton btnBuy = new JButton("Mua");
-                btnBuy.setBounds(220, 348, 70, 21);
+            JLabel imageNameLabel1 = temJLabel;
+            imageNameLabel1.setVerticalTextPosition(SwingConstants.BOTTOM);
+            imageNameLabel1.setHorizontalTextPosition(SwingConstants.CENTER);
+            imageNameLabel1.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
+            panel.add(imageNameLabel1);
+            JLabel quantityLabel = new JLabel(quantityText);
+            quantityLabel.setBounds(160, 202, 99, 13);
+            panel.add(quantityLabel);
+            JLabel lengthLabel = new JLabel(lengthText);
+            lengthLabel.setBounds(160, 225, 99, 13);
+            panel.add(lengthLabel);
+            JLabel directorLabel = new JLabel(directorText);
+            directorLabel.setBounds(160, 248, 127, 13);
+            panel.add(directorLabel);
+            JLabel costLabel = new JLabel(costText);
+            costLabel.setBounds(157, 297, 130, 20);
+            costLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
 
-                btnBuy.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                                int choice = JOptionPane.showConfirmDialog(null, "Thêm vào giỏ hàng?",
-                                                "Confirmation",
-                                                JOptionPane.YES_NO_OPTION);
-                                if (choice == JOptionPane.YES_OPTION) {
-                                        OnlineSelectionScrollPane.CART.add(new Item(productName, imageAddress, cost));
-                                }
-                        }
-                });
-                panel1.add(btnBuy);
+            panel.add(costLabel);
 
-                JLabel quantityLabel_1 = new JLabel("123");
-                quantityLabel_1.setBounds(160, 225, 99, 13);
-                panel1.add(quantityLabel_1);
+            JButton btnBuy = new JButton("Mua");
+            btnBuy.setBounds(220, 348, 70, 21);
 
-                JLabel quantityLabel_2 = new JLabel("per <dynamic>");
-                quantityLabel_2.setBounds(160, 248, 127, 13);
-                panel1.add(quantityLabel_2);
-                dmm.setVisible(true);
+            btnBuy.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int choice = JOptionPane.showConfirmDialog(null, "Thêm vào giỏ hàng?",
+                            "Confirmation", JOptionPane.YES_NO_OPTION);
+                    if (choice == JOptionPane.YES_OPTION) {
+                        Item tempItem = new Item();
+                        tempItem.setQuantity(quantity - 1);
+                        OnlineSelectionScrollPane.CART.add(new Item(title, imageAddress, cost));
+                    }
+                }
+            });
+            panel.add(btnBuy);
+            
+            JLabel lblNhSnXut = new JLabel("Nhà sản xuất: ");
+            lblNhSnXut.setBounds(160, 276, 199, 13);
+            panel.add(lblNhSnXut);
+            detailFrame.setVisible(true);
+
         }
 }

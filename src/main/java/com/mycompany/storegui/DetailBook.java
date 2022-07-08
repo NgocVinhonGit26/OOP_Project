@@ -6,10 +6,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.imageio.ImageIO;
+import java.util.List;
 
-public class DetailDVD {
-    public DetailDVD(String title, String imageAddress, Float cost, int quantity, int length, String director,
-            String producer) {
+public class DetailBook {
+    public DetailBook(String title, String imageAddress, Float cost, int quantity, List<String> authors,
+            String publisher, String category) {
 
         JFrame detailFrame = new JFrame(title);
         detailFrame.setSize(500, 500);
@@ -33,9 +34,12 @@ public class DetailDVD {
 
         String costText = "Giá: " + cost;
         String quantityText = "Số lượng: " + quantity;
-        String lengthText = "Độ dài: " + length;
-        String directorText = "Đạo diễn: " + director;
-        String producerText = "Nhà sản xuất: " + producer;
+        String authorText = "Tác giả:";
+        String nsxTest = "Nhà xuất bản: " + publisher;
+        String theloaiText = "Thể loại: " + category;
+        for (String author : authors) {
+            authorText += (" " + author);
+        }
         panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
 
         panel.validate();
@@ -54,19 +58,23 @@ public class DetailDVD {
         imageNameLabel1.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
         panel.add(imageNameLabel1);
         JLabel quantityLabel = new JLabel(quantityText);
-        quantityLabel.setBounds(160, 202, 99, 13);
+        quantityLabel.setBounds(157, 283, 99, 13);
         panel.add(quantityLabel);
-        JLabel lengthLabel = new JLabel(lengthText);
-        lengthLabel.setBounds(160, 225, 99, 13);
-        panel.add(lengthLabel);
-        JLabel directorLabel = new JLabel(directorText);
-        directorLabel.setBounds(160, 248, 127, 13);
-        panel.add(directorLabel);
-        JLabel lblNhSnXut = new JLabel(producerText);
-        lblNhSnXut.setBounds(160, 276, 199, 13);
+
+        JLabel authorLabel = new JLabel(authorText);
+        authorLabel.setBounds(157, 202, 265, 13);
+        panel.add(authorLabel);
+
+        JLabel lblNhSnXut = new JLabel(nsxTest);
+        lblNhSnXut.setBounds(157, 225, 190, 13);
         panel.add(lblNhSnXut);
+
+        JLabel lblThLoi = new JLabel(theloaiText);
+        lblThLoi.setBounds(157, 248, 161, 13);
+        panel.add(lblThLoi);
+
         JLabel costLabel = new JLabel(costText);
-        costLabel.setBounds(157, 297, 130, 20);
+        costLabel.setBounds(157, 306, 130, 20);
         costLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
 
         panel.add(costLabel);

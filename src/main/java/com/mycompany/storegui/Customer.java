@@ -7,25 +7,20 @@ package com.mycompany.storegui;
 
 import java.util.Scanner;
 
-
-/**
- *
- * @author Bassam Muhammad
- */
 public class Customer {
     private String name;
     private String address;
+    private String username;
     private String password;
-    private long phoneNumber;
-    
-    
-    public Customer(String name, String address, String password, long phoneNumber) {
+    private String phoneNumber;
+
+    public Customer(String name, String address, String username, String password, String phoneNumber) {
         this.name = name;
         this.address = address;
+        this.username = username;
         this.password = password;
         this.phoneNumber = phoneNumber;
     }
-    
 
     public String getName() {
         return name;
@@ -43,6 +38,14 @@ public class Customer {
         this.address = address;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -51,12 +54,12 @@ public class Customer {
         this.password = password;
     }
 
-    public long getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(long phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
-    
+
 }

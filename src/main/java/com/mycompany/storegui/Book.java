@@ -5,6 +5,15 @@ import java.util.List;
 
 public class Book extends Media {
     private List<String> authors = new ArrayList<String>();
+    private String publisher;
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
 
     public List<String> getAuthors() {
         return authors;
@@ -21,8 +30,10 @@ public class Book extends Media {
             return;
     }
 
-    public Book(int id, String title, String category, float cost, String authors, int quantity) {
-        super(id, title, category, cost, quantity);
+    public Book(int id, String title, String category, float cost, String authors, int quantity, String image,
+            String publisher) {
+        super(id, title, category, cost, quantity, image);
         addAuthor(authors);
+        this.publisher = publisher;
     }
 }

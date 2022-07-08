@@ -6,11 +6,17 @@
 package com.mycompany.storegui;
 
 import javax.swing.*;
+
+import com.mycompany.connectDB.connectDB;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,9 +30,11 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                                                            // to pass it to its constructor
     private static final HashMap<String, JPanel> CATEGORIES = new HashMap<>(); // keep record of categories
     public static final ArrayList<Item> CART = new ArrayList<>(); // keep record of items included in cart
-    public static final ArrayList<Book> bookList = new ArrayList<>();
     public static final ArrayList<DigitalVideoDisc> DVDList = new ArrayList<>();
+    public static final ArrayList<Book> bookList = new ArrayList<>();
+    public static final ArrayList<CompactDisc> CDList = new ArrayList<>();
     private static final HashMap<JPanel, JLabel> UNDER_EDITING_PANELS = new HashMap<>();
+    private static connectDB conn;
 
     static {
 
@@ -35,44 +43,72 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         addCategory("Book", "book.png");
         addCategory("CD", "cd.png");
 
-        DigitalVideoDisc dvd1 = new DigitalVideoDisc(1, "The Lion King", "animation", 87, "Roger Allers", 19.95f, 80);
-        DigitalVideoDisc dvd2 = new DigitalVideoDisc(2, "Justice League", "superheroes", 240, "Zach Synder", 22.95f,
-                50);
-        DigitalVideoDisc dvd3 = new DigitalVideoDisc(3, "Up", "animation", 96, "Pete Docter", 14.5f, 40);
-        DigitalVideoDisc dvd4 = new DigitalVideoDisc(4, "The Incredibles", "animation", 115, "Brad Bird", 19.95f, 55);
-        Collections.addAll(DVDList, dvd1, dvd2, dvd3, dvd4);
+        try {
+            Connection connect = conn.getConnection();
+            Statement stmt = connect.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from diaphim");
 
-        Book book1 = new Book(5, "It", "horror", 12, "Stephen King", 12);
-        Book book2 = new Book(6, "The Shining", "horror", 9, "Stephen King", 45);
-        Book book3 = new Book(7, "Dragon", "horror", 15.5f, "Lovecraft", 48);
-        Book book4 = new Book(8, "The Pillow Book", "biography", 12, "Sei Shonagon", 50);
-        Collections.addAll(bookList, book1, book2, book3, book4);
+            while (rs.next()) {
+                DigitalVideoDisc dvd = new DigitalVideoDisc(rs.getInt(1), rs.getString(2), rs.getString(6),
+                        rs.getInt(5), rs.getString(4), rs.getFloat(9), rs.getInt(7),
+                        rs.getString(10), rs.getString(3));
+                Collections.addAll(DVDList, dvd);
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
+        try {
+            Connection connect = conn.getConnection();
+            Statement stmt = connect.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from sach");
+
+            while (rs.next()) {
+                Book book = new Book(rs.getInt(1), rs.getString(2), rs.getString(5), rs.getFloat(8),
+                        rs.getString(4), rs.getInt(6), rs.getString(9), rs.getString(3));
+                Collections.addAll(bookList, book);
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
+        try {
+            Connection connect = conn.getConnection();
+            Statement stmt = connect.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from dianhac");
+
+            while (rs.next()) {
+
+                CompactDisc cd = new CompactDisc(rs.getInt(1), rs.getString(2), rs.getString(6), rs.getString(4),
+                        rs.getInt(5), rs.getFloat(9), rs.getInt(7), rs.getString(10), rs.getString(3));
+                Collections.addAll(CDList, cd);
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
 
         // add products to first category
         JPanel panel = new JPanel();
         for (DigitalVideoDisc dvd : DVDList) {
-            panel.add(addProductDVD(dvd.title, "up.png", dvd.cost, dvd.quantity, dvd.length,
-                    dvd.director));
+            panel.add(addProductDVD(dvd.title, dvd.image, dvd.cost, dvd.quantity, dvd.length, dvd.director,
+                    dvd.getProducer()));
         }
-
         CATEGORIES.get("DVD").add(panel);
 
         // add products to second category
         panel = new JPanel();
         for (Book book : bookList) {
-            panel.add(addProductBook(book.title, "demen.jpg", book.cost, book.quantity, 1, book.getAuthors(), "vinh"));
+            panel.add(addProductBook(book.title, book.image, book.cost, book.quantity, book.getAuthors(),
+                    book.getPublisher(), book.category));
         }
-        // panel.add(addProduct("The Shining", "shining.jpg", 100.f, 85));
-        // panel.add(addProduct("It", "it.png", 250.f, 14));
-        // panel.add(addProduct("Dragon", "dragon.jpg", 200.f, 90));
-        // panel.add(addProduct("Dế mèn", "demen.jpg", 150.f, 78));
-
         CATEGORIES.get("Book").add(panel);
 
         // add products to third category
         panel = new JPanel();
-        // panel.add(addProduct("Mint Jams", "mint.jpg", 1000.f, 45));
-        // panel.add(addProduct("The Beatles", "beatles.png", 3000.f, 45));
+        for (CompactDisc cd : CDList) {
+            panel.add(addProductCD(cd.title, cd.image, cd.getArtist(), cd.length, cd.cost, cd.quantity,
+                    cd.getDirector(), cd.getTrackList()));
+        }
         CATEGORIES.get("CD").add(panel);
 
     }
@@ -448,7 +484,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
                 } else { // if not admin access
 
-                    Detail detail = new DetailDVD(productName, imageAddress, cost, quantity, 1, "vinh");
+                    DetailDVD detail = new DetailDVD(productName, imageAddress, cost, quantity, 1, "vinh", "vinh");
                     // test detail = new test(productName, imageAddress, cost, quantity);
                 }
             }
@@ -476,7 +512,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
     }
 
     private static JPanel addProductDVD(String title, String imageAddress, Float cost, int quantity, int length,
-            String director) {
+            String director, String producer) {
         JPanel panel = new JPanel();
         BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
         panel.setLayout(layout);
@@ -572,7 +608,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
                 } else { // if not admin access
 
-                    Detail detail = new DetailDVD(title, imageAddress, cost, quantity, length, director);
+                    DetailDVD detail = new DetailDVD(title, imageAddress, cost, quantity, length, director, producer);
                     // test detail = new test(productName, imageAddress, cost, quantity);
                 }
             }
@@ -600,8 +636,8 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
     }
 
-    private static JPanel addProductBook(String title, String imageAddress, Float cost, int quantity, int length,
-            List<String> authors, String director) {
+    private static JPanel addProductBook(String title, String imageAddress, Float cost, int quantity,
+            List<String> authors, String publisher, String category) {
         JPanel panel = new JPanel();
         BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
         panel.setLayout(layout);
@@ -693,8 +729,130 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
                 } else { // if not admin access
 
-                    Detail detail = new Detail(title, imageAddress, cost, quantity, length, director);
+                    DetailBook detail = new DetailBook(title, imageAddress, cost, quantity, authors, publisher,
+                            category);
                     // test detail = new test(productName, imageAddress, cost, quantity);
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                panel.setBackground(Color.pink);
+                panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.red));
+
+                if (OnlineLoginPanel.isAdminAccess())
+                    panel.setToolTipText("Nhấp chuột trái để xóa. Nhấp chuột phải để chỉnh sửa");
+
+                else
+                    panel.setToolTipText("Bấm vào để mua");
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                panel.setBackground(null);
+                panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
+            }
+
+        });
+        return panel;
+
+    }
+
+    private static JPanel addProductCD(String title, String imageAddress, String director, int length, Float cost,
+            int quantity, String artist, List<Track> trackList) {
+        JPanel panel = new JPanel();
+        BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
+        panel.setLayout(layout);
+        JLabel tempLabel;
+        try {
+            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
+            tempLabel = new JLabel(title, new ImageIcon(ImageIO.read(url)), JLabel.CENTER);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR", JOptionPane.ERROR_MESSAGE);
+            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
+            tempLabel = new JLabel(title, new ImageIcon(url), JLabel.CENTER);
+        }
+
+        JLabel imageNameLabel = tempLabel;
+        imageNameLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
+        imageNameLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        imageNameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
+        panel.add(imageNameLabel);
+
+        String costText = "Giá: " + cost;
+        JLabel costLabel = new JLabel(costText);
+        costLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
+
+        String quantityText = "Số lượng: " + quantity;
+        JLabel quantityLabel = new JLabel(quantityText);
+
+        panel.add(costLabel);
+        panel.add(quantityLabel);
+        panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
+        panel.validate();
+        panel.repaint();
+
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (OnlineLoginPanel.isAdminAccess()) {
+                    if (!e.isMetaDown()) {// if not right click
+                        int choice = JOptionPane.showConfirmDialog(null, "Xóa ?", "Confirmation",
+                                JOptionPane.YES_NO_OPTION);
+                        if (choice == JOptionPane.YES_OPTION) {
+                            JPanel parentPanel = (JPanel) panel.getParent();
+                            parentPanel.remove(panel);
+                            parentPanel.validate();
+                            parentPanel.repaint();
+                        }
+                    }
+
+                    else { // if right click
+                        int choice = JOptionPane.showConfirmDialog(null, "Cập nhật sản phẩm ?", "Confirmation",
+                                JOptionPane.YES_NO_OPTION);
+                        if (choice == JOptionPane.YES_OPTION) {
+                            try {
+                                String productName = JOptionPane.showInputDialog(null, "Nhập tên sản phẩm");
+                                if (productName == null)
+                                    throw new NullPointerException();
+
+                                String imageAddress = JOptionPane.showInputDialog(null, "Nhập địa chỉ ảnh minh họa");
+                                if (imageAddress == null)
+                                    throw new NullPointerException();
+
+                                float cost = Float.parseFloat((String) JOptionPane.showInputDialog(null, "Nhập giá"));
+                                int quantity = Integer.parseInt((String) JOptionPane.showInputDialog(null,
+                                        "Enter quantity(it will be displayed as cost per quantity)"));
+                                if (productName == null || imageAddress == null)
+                                    throw new NullPointerException();
+
+                                URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
+                                File file = new File(imageAddress);
+                                imageNameLabel.setText(productName);
+                                imageNameLabel.setIcon(new ImageIcon(ImageIO.read(url)));
+
+                                costLabel.setText("" + cost);
+                                quantityLabel.setText("" + quantity);
+                            } catch (NumberFormatException ex) {
+                                JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ", "ERROR",
+                                        JOptionPane.ERROR_MESSAGE);
+                            } catch (IOException ex) {
+                                JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
+                                        JOptionPane.ERROR_MESSAGE);
+                            } catch (NullPointerException ex) {
+                                JOptionPane.showMessageDialog(null, "Operation Cancelled");
+                            } catch (Exception ex) {
+                                JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
+                                        JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+
+                    }
+
+                } else { // if not admin access
+
+                    DetailCD detail = new DetailCD(title, imageAddress, director, length, cost, quantity, artist,
+                            trackList);
                 }
             }
 

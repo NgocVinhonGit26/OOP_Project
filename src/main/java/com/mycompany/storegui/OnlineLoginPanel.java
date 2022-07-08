@@ -8,15 +8,20 @@ package com.mycompany.storegui;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.Thread.State;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 import javax.swing.*;
+
+import com.mycompany.connectDB.connectDB;
+
 import java.util.Arrays;
 
-/**
- *
- * @author Bassam Muhammad
- */
 public class OnlineLoginPanel extends JPanel {
     private static boolean adminAccess = false;
+    private static connectDB conn;
 
     public OnlineLoginPanel() {
         super();
@@ -27,21 +32,21 @@ public class OnlineLoginPanel extends JPanel {
 
         JTextField emailField = new JTextField(20);
         JPanel emailPanel = new JPanel();
-        emailPanel.add(new JLabel("Email Address: "));
+        emailPanel.add(new JLabel("Tài khoản: "));
         emailPanel.add(emailField);
         emailPanel.setPreferredSize(size);
         emailPanel.setMaximumSize(size);
 
         JPasswordField passwordField = new JPasswordField(20);
         JPanel passwordPanel = new JPanel();
-        passwordPanel.add(new JLabel("Password:"));
+        passwordPanel.add(new JLabel("Mật khẩu:"));
         passwordPanel.add(passwordField);
         passwordPanel.setPreferredSize(size);
         passwordPanel.setMaximumSize(size);
 
-        JButton btnforgotPassword = new JButton("Forgot Password");
-        JButton btnLogin = new JButton("Login");
-        JButton btnRegister = new JButton("Register");
+        JButton btnforgotPassword = new JButton("Quên mật khẩu");
+        JButton btnLogin = new JButton("Đăng nhập");
+        JButton btnRegister = new JButton("Đăng ký");
         JButton btnBack = new JButton("Back");
         JPanel logPanel = new JPanel();
 
@@ -60,38 +65,67 @@ public class OnlineLoginPanel extends JPanel {
         btnforgotPassword.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String email = JOptionPane.showInputDialog(null, "Enter email address");
-                if (OnlineRegistrationPanel.CUSTOMERS.containsKey(email))
-                    JOptionPane.showMessageDialog(null, "Message sent to your email and mobile", "Information",
-                            JOptionPane.INFORMATION_MESSAGE);
-                else
-                    JOptionPane.showMessageDialog(null, "Incorrect Email", "ERROR", JOptionPane.ERROR_MESSAGE);
+                String email = JOptionPane.showInputDialog(null, "Nhập địa chỉ email");
+                try {
+                    Connection connect = conn.getConnection();
+                    Statement stmt = connect.createStatement();
+                    ResultSet rs = stmt.executeQuery("select * from user");
+                    int check = 0;
+                    while (rs.next()) {
+                        if (rs.getString(2).equals(email)) {
+                            JOptionPane.showMessageDialog(null,
+                                    "Tin nhắn được gửi đến email và điện thoại di động của bạn",
+                                    "Information", JOptionPane.INFORMATION_MESSAGE);
+                            check = 1;
+                        }
+                    }
+                    if (check == 0)
+                        JOptionPane.showMessageDialog(null, "Incorrect Email", "ERROR", JOptionPane.ERROR_MESSAGE);
+                } catch (Exception ex) {
+                    // TODO: handle exception
+                }
             }
         });
 
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (OnlineRegistrationPanel.CUSTOMERS.containsKey(emailField.getText())) {
-                    if (OnlineRegistrationPanel.CUSTOMERS.get(emailField.getText()).getPassword()
-                            .equals(Arrays.toString(passwordField.getPassword()))) { // if entered password matches with
-                                                                                     // password in system
-                        OnlineRegistrationPanel.setLogin(true);
-                        OnlineBuyCartPanel.setLoginedEmail(emailField.getText());
-                        if (emailField.getText().equals("anonymousAdmin@amail.com")
-                                || emailField.getText().equals("Vinh.pn@mail.com")) {
-                            JOptionPane.showMessageDialog(null, "Admin Access");
-                            adminAccess = true;
-                            MainPanel.setSubContainer(new OnlineSelectionScrollPane());
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Successfully Login");
-                            MainPanel.setSubContainer(new OnlineBuyCartPanel());
+                try {
+                    Connection connect = conn.getConnection();
+                    Statement stmt = connect.createStatement();
+                    ResultSet rs = stmt.executeQuery("select * from user");
+                    int check = 0;
+                    while (rs.next()) {
+                        // System.out.println(rs.getString(2));
+                        if (emailField.getText().equals(rs.getString(2))) {
+                            check = 1;
+                            if (rs.getString(3).equals(String.valueOf(passwordField.getPassword()))) {
+                                OnlineRegistrationPanel.setLogin(true);
+                                OnlineBuyCartPanel.setLoginedEmail(emailField.getText());
+                                if (rs.getBoolean(7)) {
+                                    JOptionPane.showMessageDialog(null, "Admin Access");
+                                    adminAccess = true;
+                                    MainPanel.setSubContainer(new OnlineSelectionScrollPane());
+                                    break;
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "Đăng nhập thành công");
+                                    MainPanel.setSubContainer(new OnlineBuyCartPanel());
+                                    break;
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Sai mật khẩu", "ERROR",
+                                        JOptionPane.ERROR_MESSAGE);
+                                break;
+                            }
                         }
+                    }
+                    if (check == 0) {
+                        JOptionPane.showMessageDialog(null, "Nhập sai Email", "ERROR",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
 
-                    } else
-                        JOptionPane.showMessageDialog(null, "Incorrect Password", "ERROR", JOptionPane.ERROR_MESSAGE);
-                } else
-                    JOptionPane.showMessageDialog(null, "Incorrect Email", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
 
             }
         });

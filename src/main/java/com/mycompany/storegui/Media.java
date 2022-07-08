@@ -6,6 +6,7 @@ public abstract class Media {
 	protected String category;
 	protected float cost;
 	protected int quantity;
+	protected String image;
 
 	public int getId() {
 		return id;
@@ -39,11 +40,12 @@ public abstract class Media {
 		this.cost = cost;
 	}
 
-	public Media(int id, String title, String category, float cost, int quantity) {
+	public Media(int id, String title, String category, float cost, int quantity, String image) {
 		this.id = id;
 		this.title = title;
 		this.category = category;
 		this.cost = cost;
 		this.quantity = quantity;
+		this.image = image;
 	}
 }

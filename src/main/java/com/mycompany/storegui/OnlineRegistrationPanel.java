@@ -6,121 +6,174 @@
 package com.mycompany.storegui;
 
 import javax.swing.*;
+
+import com.mycompany.connectDB.connectDB;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashMap;
 
-/**
- *
- * @author Bassam Muhammad
- */
 public class OnlineRegistrationPanel extends JPanel {
     private final GridBagConstraints gbc = new GridBagConstraints();
     public static final HashMap<String, Customer> CUSTOMERS = new HashMap<>(); // keep record of customers
     private static boolean login = false;
-
-    static {
-        CUSTOMERS.put("anonymousAdmin@amail.com", new Customer("Admin", "Anonymous",
-                Arrays.toString(new char[] { 'a', 'd', 'm', 'i', 'n', '1', '2', '3' }), 12345678910l));
-        CUSTOMERS.put("Vinh.pn@mail.com", new Customer("Phùng Ngọc Vinh", "Hà Nội",
-                Arrays.toString(new char[] { 'a', 'd', 'm', 'i', 'n', '1', '2', '3' }), 12345678910l)); // add admin
-                                                                                                        // information
-    }
+    private static String DB_URL = "jdbc:mysql://localhost:3306/onemediapro";
+    private static String USER_NAME = "root";
+    private static String PASSWORD = "26072001";
+    private static connectDB conn;
 
     public OnlineRegistrationPanel() {
         super(new GridBagLayout());
 
         gbc.insets = new Insets(0, 0, 5, 5); // spacings
 
-        addComponent(new JLabel("Email Address: "), 0, 0, 1, 1);
+        addComponent(new JLabel("Tài khoản: "), 0, 0, 1, 1);
 
         JTextField emailField = new JTextField(20);
         addComponent(emailField, 1, 0, 1, 1);
 
-        addComponent(new JLabel("Password: "), 2, 0, 1, 1);
+        addComponent(new JLabel("Mật khẩu: "), 2, 0, 1, 1);
 
         JPasswordField passwordField = new JPasswordField(20);
         addComponent(passwordField, 3, 0, 2, 1);
 
-        addComponent(new JLabel("Name: "), 0, 1, 1, 1);
+        addComponent(new JLabel("Họ tên: "), 0, 1, 1, 1);
 
         JTextField nameField = new JTextField(20);
         addComponent(nameField, 1, 1, 1, 1);
 
-        addComponent(new JLabel("Mobile Number: "), 2, 1, 1, 1);
+        addComponent(new JLabel("Số điện thoại: "), 2, 1, 1, 1);
 
         JTextField mobileField = new JTextField(20);
         addComponent(mobileField, 3, 1, 1, 1);
 
-        addComponent(new JLabel("Location: "), 0, 2, 1, 1);
+        addComponent(new JLabel("Địa chỉ: "), 0, 2, 1, 1);
 
-        JButton btnRegister = new JButton("Register");
+        JTextField locationField = new JTextField(45);
+        addComponent(locationField, 1, 2, 3, 1);
+
+        JButton btnRegister = new JButton("Đăng kí");
         addComponent(btnRegister, 1, 3, 1, 1);
 
         JButton btnBack = new JButton("Back");
         addComponent(btnBack, 2, 3, 1, 1);
 
         gbc.insets = new Insets(0, -50, 5, 0);
-        JTextField locationField = new JTextField(45);
-        addComponent(locationField, 1, 2, 3, 1);
 
         btnRegister.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (emailField.getText().contains("@mail.com")) {
-                    if (!CUSTOMERS.containsKey(emailField.getText())) {
-                        if (passwordField.getPassword().length >= 8) {
-                            if (!nameField.getText().isBlank()) {
-                                if (!locationField.getText().isBlank()) {
-                                    try {
-                                        long mobileNumber = Long.parseLong(mobileField.getText());
-                                        if (mobileNumber < 0 || mobileField.getText().length() != 11)
-                                            throw new NumberFormatException();
+                try {
+                    Connection connect = conn.getConnection();
+                    Statement stmt = connect.createStatement();
+                    ResultSet rs = stmt.executeQuery("select * from user");
+                    Integer check = 0;
+                    System.out.println("check0");
+                    while (rs.next()) {
+                        if (emailField.getText().contains("@mail.com")) {
+                            System.out.println("check0123");
+                            if (!emailField.getText().equals(rs.getString(2))) {
+                                check = 1;
+                                System.out.println("check: " + emailField.getText() + " " + (rs.getString(2)));
+                                if (passwordField.getPassword().length >= 8) {
+                                    if (!nameField.getText().isBlank()) {
+                                        if (!locationField.getText().isBlank()) {
+                                            if (mobileField.getText().length() == 10) {
 
-                                        CUSTOMERS.put(emailField.getText(),
-                                                new Customer(nameField.getText(), locationField.getText(),
-                                                        Arrays.toString(passwordField.getPassword()), mobileNumber));
+                                                Connection connection = DriverManager.getConnection(DB_URL, USER_NAME,
+                                                        PASSWORD);
+                                                String sql = "insert into user (`userName`,`passWord`,`tenkhachhang`,`sodienthoai`,`diachi`,`chucnang`) values(?,?,?,?,?,?)";
+                                                PreparedStatement ps = connection.prepareStatement(sql);
+                                                System.out.println(emailField.getText());
+                                                // ps.setInt(1, 500);
+                                                ps.setString(1, String.valueOf(emailField.getText()));
+                                                ps.setString(2, String.valueOf(passwordField.getPassword()));
+                                                ps.setString(3, String.valueOf(nameField.getText()));
+                                                ps.setString(4, String.valueOf(mobileField.getText()));
+                                                ps.setString(5, String.valueOf(locationField.getText()));
+                                                ps.setInt(6, 0);
 
-                                        setLogin(true);
-                                        OnlineBuyCartPanel.setLoginedEmail(emailField.getText());
+                                                ps.executeUpdate();
+                                                ps.close();
 
-                                        JOptionPane.showMessageDialog(null, "Successfully registered", "Information",
-                                                JOptionPane.INFORMATION_MESSAGE);
+                                                setLogin(true);
+                                                OnlineBuyCartPanel.setLoginedEmail(emailField.getText());
 
-                                        MainPanel.setSubContainer(new OnlineBuyCartPanel());
+                                                JOptionPane.showMessageDialog(null, "Đăng ký thành công",
+                                                        "Information",
+                                                        JOptionPane.INFORMATION_MESSAGE);
 
-                                    } catch (NumberFormatException ex) {
-                                        JOptionPane.showMessageDialog(null, "Invalid mobile number", "ERROR",
+                                                MainPanel.setSubContainer(new OnlineBuyCartPanel());
+
+                                                connect.close();
+                                                break;
+                                            } else {
+                                                JOptionPane.showMessageDialog(null, "Số điện thoại không hợp lệ",
+                                                        "ERROR",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                                break;
+                                            }
+
+                                        } else {
+                                            JOptionPane.showMessageDialog(null, "Địa chỉ không hợp lệ", "ERROR",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                            break;
+                                        }
+
+                                    } else {
+                                        JOptionPane.showMessageDialog(null, "Tên không hợp lệ", "ERROR",
                                                 JOptionPane.ERROR_MESSAGE);
+                                        break;
                                     }
 
-                                } else
-                                    JOptionPane.showMessageDialog(null, "Invalid location", "ERROR",
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "Mật khẩu phải có ít nhất 8 ký tự",
+                                            "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
+                                    break;
+                                }
+                            }
+                            // else {
+                            // JOptionPane.showMessageDialog(null, "Email đã được đăng ký", "ERROR",
+                            // JOptionPane.ERROR_MESSAGE);
+                            // // break;
+                            // }
+                        } else {
+                            // if (check == 0) {
+                            // JOptionPane.showMessageDialog(null, "Email đã được đăng ký", "ERROR",
+                            // JOptionPane.ERROR_MESSAGE);
 
-                            } else
-                                JOptionPane.showMessageDialog(null, "Invalid name", "ERROR", JOptionPane.ERROR_MESSAGE);
-
-                        } else
-                            JOptionPane.showMessageDialog(null, "Password should be have atleast 8 character", "ERROR",
+                            JOptionPane.showMessageDialog(null, "Địa chỉ email không hợp lệ", "ERROR",
                                     JOptionPane.ERROR_MESSAGE);
-                    } else
-                        JOptionPane.showMessageDialog(null, "Email already registered", "ERROR",
+
+                            break;
+                        }
+
+                    }
+                    if (check == 0) {
+                        JOptionPane.showMessageDialog(null, "Email đã được đăng ký", "ERROR",
                                 JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
 
-                } else
-                    JOptionPane.showMessageDialog(null, "Invalid Email Address", "ERROR", JOptionPane.ERROR_MESSAGE);
-
+                }
             }
         });
 
         btnBack.addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 MainPanel.setSubContainer(new OnlineSelectionScrollPane());
             }
+
         });
 
     }

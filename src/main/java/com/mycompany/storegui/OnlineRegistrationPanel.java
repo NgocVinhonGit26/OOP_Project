@@ -76,90 +76,89 @@ public class OnlineRegistrationPanel extends JPanel {
                     ResultSet rs = stmt.executeQuery("select * from user");
                     Integer check = 0;
                     System.out.println("check0");
-                    while (rs.next()) {
-                        if (emailField.getText().contains("@mail.com")) {
-                            System.out.println("check0123");
-                            if (!emailField.getText().equals(rs.getString(2))) {
+
+                    if (emailField.getText().contains("@mail.com")) {
+                        System.out.println("check0123");
+                        while (rs.next()) {
+                            if (emailField.getText().equals(rs.getString(2))) {
                                 check = 1;
-                                System.out.println("check: " + emailField.getText() + " " + (rs.getString(2)));
-                                if (passwordField.getPassword().length >= 8) {
-                                    if (!nameField.getText().isBlank()) {
-                                        if (!locationField.getText().isBlank()) {
-                                            if (mobileField.getText().length() == 10) {
+                                break;
+                            }
+                        }
+                        if (check == 0) {
+                            // check = 1;
+                            // System.out.println("check: " + emailField.getText() + " " +
+                            // (rs.getString(2)));
+                            if (passwordField.getPassword().length >= 8) {
+                                if (!nameField.getText().isBlank()) {
+                                    if (!locationField.getText().isBlank()) {
+                                        if (mobileField.getText().length() == 10) {
 
-                                                Connection connection = DriverManager.getConnection(DB_URL, USER_NAME,
-                                                        PASSWORD);
-                                                String sql = "insert into user (`userName`,`passWord`,`tenkhachhang`,`sodienthoai`,`diachi`,`chucnang`) values(?,?,?,?,?,?)";
-                                                PreparedStatement ps = connection.prepareStatement(sql);
-                                                System.out.println(emailField.getText());
-                                                // ps.setInt(1, 500);
-                                                ps.setString(1, String.valueOf(emailField.getText()));
-                                                ps.setString(2, String.valueOf(passwordField.getPassword()));
-                                                ps.setString(3, String.valueOf(nameField.getText()));
-                                                ps.setString(4, String.valueOf(mobileField.getText()));
-                                                ps.setString(5, String.valueOf(locationField.getText()));
-                                                ps.setInt(6, 0);
+                                            Connection connection = DriverManager.getConnection(DB_URL, USER_NAME,
+                                                    PASSWORD);
+                                            String sql = "insert into user (`userName`,`passWord`,`tenkhachhang`,`sodienthoai`,`diachi`,`chucnang`) values(?,?,?,?,?,?)";
+                                            PreparedStatement ps = connection.prepareStatement(sql);
+                                            System.out.println(emailField.getText());
+                                            ps.setInt(1, 500);
+                                            ps.setString(1, String.valueOf(emailField.getText()));
+                                            ps.setString(2, String.valueOf(passwordField.getPassword()));
+                                            ps.setString(3, String.valueOf(nameField.getText()));
+                                            ps.setString(4, String.valueOf(mobileField.getText()));
+                                            ps.setString(5, String.valueOf(locationField.getText()));
+                                            ps.setInt(6, 0);
 
-                                                ps.executeUpdate();
-                                                ps.close();
+                                            ps.executeUpdate();
+                                            ps.close();
 
-                                                setLogin(true);
-                                                OnlineBuyCartPanel.setLoginedEmail(emailField.getText());
+                                            setLogin(true);
+                                            OnlineBuyCartPanel.setLoginedEmail(emailField.getText());
 
-                                                JOptionPane.showMessageDialog(null, "Đăng ký thành công",
-                                                        "Information",
-                                                        JOptionPane.INFORMATION_MESSAGE);
+                                            JOptionPane.showMessageDialog(null, "Đăng ký thành công",
+                                                    "Information",
+                                                    JOptionPane.INFORMATION_MESSAGE);
 
-                                                MainPanel.setSubContainer(new OnlineBuyCartPanel());
+                                            MainPanel.setSubContainer(new OnlineBuyCartPanel());
 
-                                                connect.close();
-                                                break;
-                                            } else {
-                                                JOptionPane.showMessageDialog(null, "Số điện thoại không hợp lệ",
-                                                        "ERROR",
-                                                        JOptionPane.ERROR_MESSAGE);
-                                                break;
-                                            }
+                                            connect.close();
 
                                         } else {
-                                            JOptionPane.showMessageDialog(null, "Địa chỉ không hợp lệ", "ERROR",
+                                            JOptionPane.showMessageDialog(null, "Số điện thoại không hợp lệ",
+                                                    "ERROR",
                                                     JOptionPane.ERROR_MESSAGE);
-                                            break;
+
                                         }
 
                                     } else {
-                                        JOptionPane.showMessageDialog(null, "Tên không hợp lệ", "ERROR",
+                                        JOptionPane.showMessageDialog(null, "Địa chỉ không hợp lệ", "ERROR",
                                                 JOptionPane.ERROR_MESSAGE);
-                                        break;
+
                                     }
 
                                 } else {
-                                    JOptionPane.showMessageDialog(null, "Mật khẩu phải có ít nhất 8 ký tự",
-                                            "ERROR",
+                                    JOptionPane.showMessageDialog(null, "Tên không hợp lệ", "ERROR",
                                             JOptionPane.ERROR_MESSAGE);
-                                    break;
+
                                 }
+
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Mật khẩu phải có ít nhất 8 ký tự",
+                                        "ERROR",
+                                        JOptionPane.ERROR_MESSAGE);
+
                             }
-                            // else {
-                            // JOptionPane.showMessageDialog(null, "Email đã được đăng ký", "ERROR",
-                            // JOptionPane.ERROR_MESSAGE);
-                            // // break;
-                            // }
                         } else {
-                            // if (check == 0) {
-                            // JOptionPane.showMessageDialog(null, "Email đã được đăng ký", "ERROR",
-                            // JOptionPane.ERROR_MESSAGE);
-
-                            JOptionPane.showMessageDialog(null, "Địa chỉ email không hợp lệ", "ERROR",
+                            JOptionPane.showMessageDialog(null, "Email đã được đăng ký", "ERROR",
                                     JOptionPane.ERROR_MESSAGE);
-
-                            break;
+                            // break;
                         }
+                    } else {
+                        // if (check == 0) {
+                        // JOptionPane.showMessageDialog(null, "Email đã được đăng ký", "ERROR",
+                        // JOptionPane.ERROR_MESSAGE);
 
-                    }
-                    if (check == 0) {
-                        JOptionPane.showMessageDialog(null, "Email đã được đăng ký", "ERROR",
+                        JOptionPane.showMessageDialog(null, "Địa chỉ email không hợp lệ", "ERROR",
                                 JOptionPane.ERROR_MESSAGE);
+
                     }
                 } catch (Exception ex) {
 

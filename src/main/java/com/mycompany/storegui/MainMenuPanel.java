@@ -44,11 +44,10 @@ public class MainMenuPanel extends JPanel {
 
         ActionHandler handler = new ActionHandler();
         btnOnline.addActionListener(handler);
-        
-        
+
         try {
             URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("bg1.jpg");
-            tempLabel = new JLabel(new ImageIcon(url),JLabel.CENTER);
+            tempLabel = new JLabel(new ImageIcon(url), JLabel.CENTER);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Image not found", "ERROR", JOptionPane.ERROR_MESSAGE);
             URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
@@ -56,7 +55,6 @@ public class MainMenuPanel extends JPanel {
         }
         addComponent(tempLabel, 0, 0, 0, 1);
 
-        
     }
 
     private void addComponent(Component component, int gridx, int gridy, int gridwidth, int gridheight) {

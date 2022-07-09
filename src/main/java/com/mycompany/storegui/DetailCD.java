@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -18,8 +20,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import com.mycompany.connectDB.connectDB;
+
 public class DetailCD {
-    public DetailCD(String title, String imageAddress, String director, int length, Float cost, int quantity,
+
+    private static connectDB conn;
+
+    public DetailCD(int id, String title, String imageAddress, String director, int length, Float cost, int quantity,
             String artist, List<Track> trackList) {
 
         JFrame detailFrame = new JFrame(title);
@@ -99,12 +106,27 @@ public class DetailCD {
         btnBuy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int choice = JOptionPane.showConfirmDialog(null, "Thêm vào giỏ hàng?",
-                        "Confirmation", JOptionPane.YES_NO_OPTION);
-                if (choice == JOptionPane.YES_OPTION) {
-                    Item tempItem = new Item();
-                    tempItem.setQuantity(quantity - 1);
-                    OnlineSelectionScrollPane.CART.add(new Item(title, imageAddress, cost));
+                try {
+                    Connection connection = conn.getConnection();
+                    String sql = "UPDATE dianhac set soluong=? WHERE masanpham=?";
+                    PreparedStatement stmt = null;
+                    int choice = JOptionPane.showConfirmDialog(null, "Thêm vào giỏ hàng?",
+                            "Confirmation", JOptionPane.YES_NO_OPTION);
+                    if (choice == JOptionPane.YES_OPTION) {
+                        stmt = connection.prepareStatement(sql);
+                        stmt.setInt(1, quantity - 1);
+                        stmt.setInt(2, id);
+                        stmt.executeUpdate();
+
+                        Item tempItem = new Item();
+                        tempItem.setQuantity(quantity - 1);
+
+                        OnlineSelectionScrollPane.CART.add(new Item(title, imageAddress, cost));
+
+                        System.out.println("datialcd");
+                    }
+                } catch (Exception ex) {
+                    // TODO: handle exception
                 }
             }
         });

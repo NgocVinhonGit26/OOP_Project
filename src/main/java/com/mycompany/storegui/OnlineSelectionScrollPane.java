@@ -15,12 +15,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -106,7 +109,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         // add products to third category
         panel = new JPanel();
         for (CompactDisc cd : CDList) {
-            panel.add(addProductCD(cd.title, cd.image, cd.getArtist(), cd.length, cd.cost, cd.quantity,
+            panel.add(addProductCD(cd.id, cd.title, cd.image, cd.getArtist(), cd.length, cd.cost, cd.quantity,
                     cd.getDirector(), cd.getTrackList()));
         }
         CATEGORIES.get("CD").add(panel);
@@ -267,39 +270,92 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     try {
+                                        // Connection connect = conn.getConnection();
+                                        // Statement stmt = connect.createStatement();
+                                        // ResultSet rs = stmt.executeQuery("select * from user");
+                                        // dang do
                                         String productName = JOptionPane.showInputDialog(null, "Nhập tên sản phẩm");
-                                        String imageAddress = JOptionPane.showInputDialog(null,
-                                                "Nhập địa chỉ hình ảnh");
-                                        float cost = Float.parseFloat((String) JOptionPane.showInputDialog(null,
-                                                "Nhập giá sản phẩm"));
-                                        int quantity = Integer.parseInt((String) JOptionPane.showInputDialog(null,
-                                                "Enter quantity(it will be displayed as cost per quantity)"));
+                                        if (!productName.isBlank()) {
+                                            String imageAddress = JOptionPane.showInputDialog(null,
+                                                    "Nhập địa chỉ hình ảnh");
+                                            if (!imageAddress.isBlank()) {
+                                                String costText = (String) JOptionPane.showInputDialog(null,
+                                                        "Nhập giá sản phẩm");
+                                                if (costText.isBlank()) { // ktra rong
+                                                    JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ",
+                                                            "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                }
+                                                for (char c : costText.toCharArray()) { // ktra co phai la so hay khong
+                                                    if (!Character.isDigit(c)) {
+                                                        System.out.println("pessi0");
+                                                        JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ",
+                                                                "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                        break;
+                                                    }
+                                                }
+
+                                                float cost = Float.parseFloat(costText);
+
+                                                String quantityText = (String) JOptionPane.showInputDialog(null,
+                                                        "Nhập số lượng");
+
+                                                if (quantityText.isBlank()) {
+                                                    JOptionPane.showMessageDialog(null, "Số lượng không hợp lệ",
+                                                            "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                }
+                                                for (char c : quantityText.toCharArray()) {
+                                                    if ((!Character.isDigit(c))) {
+                                                        JOptionPane.showMessageDialog(null, "Số lượng không hợp lệ",
+                                                                "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                        break;
+                                                    }
+                                                }
+                                                int quantity = Integer.parseInt(quantityText);
+                                                // do dang : insert vao db
+                                                try {
+                                                    JPanel subPanel = (JPanel) panel.getComponent(1);
+                                                    JPanel subSubPanel = addProduct(productName, imageAddress, cost,
+                                                            quantity);
+                                                    subPanel.add(subSubPanel);
+                                                    subPanel.validate();
+                                                    subPanel.repaint();
+                                                } catch (ArrayIndexOutOfBoundsException ex) {
+                                                    JPanel subPanel = new JPanel();
+                                                    JPanel subSubPanel = addProduct(productName, imageAddress, cost,
+                                                            quantity);
+                                                    subPanel.add(subSubPanel);
+                                                    subPanel.validate();
+                                                    subPanel.repaint();
+                                                    panel.add(subPanel);
+                                                    panel.validate();
+                                                    panel.repaint();
+                                                }
+                                            } else {
+                                                JOptionPane.showMessageDialog(null, "Ảnh trống", "ERROR",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                            }
+                                        } else {
+                                            JOptionPane.showMessageDialog(null, "Tên sản phẩm trống", "ERROR",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                        }
 
                                         if (productName == null || imageAddress == null)
                                             throw new NullPointerException();
+                                        // if(productName == null){
+                                        // JOptionPane.showMessageDialog(null, "Tên không hợp lệ", "ERROR",
+                                        // JOptionPane.ERROR_MESSAGE);
+                                        // }
+                                        // System.out.println("1" + productName + "1");
 
-                                        try {
-                                            JPanel subPanel = (JPanel) panel.getComponent(1);
-                                            JPanel subSubPanel = addProduct(productName, imageAddress, cost, quantity);
-                                            subPanel.add(subSubPanel);
-                                            subPanel.validate();
-                                            subPanel.repaint();
-                                        } catch (ArrayIndexOutOfBoundsException ex) {
-                                            JPanel subPanel = new JPanel();
-                                            JPanel subSubPanel = addProduct(productName, imageAddress, cost, quantity);
-                                            subPanel.add(subSubPanel);
-                                            subPanel.validate();
-                                            subPanel.repaint();
-                                            panel.add(subPanel);
-                                            panel.validate();
-                                            panel.repaint();
-                                        }
-                                    } catch (NumberFormatException ex) {
-                                        JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ", "ERROR",
-                                                JOptionPane.ERROR_MESSAGE);
-                                    } catch (NullPointerException ex) {
-                                        JOptionPane.showMessageDialog(null, "Operation Cancelled");
+                                    } catch (Exception ex) {
+
                                     }
+                                    // catch (NumberFormatException ex) {
+                                    // JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ", "ERROR",
+                                    // JOptionPane.ERROR_MESSAGE);
+                                    // } catch (NullPointerException ex) {
+                                    // JOptionPane.showMessageDialog(null, "Thao tác đã bị hủy bỏ");
+                                    // }
 
                                 }
                             });
@@ -758,7 +814,8 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
     }
 
-    private static JPanel addProductCD(String title, String imageAddress, String director, int length, Float cost,
+    private static JPanel addProductCD(int id, String title, String imageAddress, String director, int length,
+            Float cost,
             int quantity, String artist, List<Track> trackList) {
         JPanel panel = new JPanel();
         BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
@@ -851,7 +908,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
                 } else { // if not admin access
 
-                    DetailCD detail = new DetailCD(title, imageAddress, director, length, cost, quantity, artist,
+                    DetailCD detail = new DetailCD(id, title, imageAddress, director, length, cost, quantity, artist,
                             trackList);
                 }
             }

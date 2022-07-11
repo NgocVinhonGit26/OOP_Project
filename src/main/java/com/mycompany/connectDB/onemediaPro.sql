@@ -15,9 +15,10 @@ create table `user` (
 insert into `user` (`userName`,`passWord`,`tenkhachhang`,`sodienthoai`,`diachi`,`chucnang`) values 
 					('vinh.pn@mail.com','admin','phung ngoc vinh', '0867630856', 'quoc oai - ha noi', 1),
 					('dieu.nth@mail.com','admin','ngo thi huyen dieu', '0375384273', 'tien du - bac ninh', 1),
+                    ('1','1','phung ngoc vinh', '0867630856', 'quoc oai - ha noi', 1),
                     ('admin@mail.com','admin','admin', '0867630878', 'quoc oai - ha noi', 0);
 create table `sach` (
-	`masanpham` int not null,
+	`masanpham` int auto_increment,
     `tensanpham` varchar(45) not null,
     `nhaxuatban` varchar(45) not null,
     `tacgia` varchar(20) not null,
@@ -36,7 +37,7 @@ insert into `sach` (`masanpham`,`tensanpham`,`nhaxuatban`,`tacgia`,`theloai`,`so
                     (8,"De men phieu luu ky","Nha xuat Kim Dong", "To Hoai","Truyen tranh",100,25000,30000,"demen.jpg");
 
 create table `dianhac` (
-	`masanpham` int not null,
+	`masanpham` int auto_increment,
     `tensanpham` varchar(45) not null,
     `nhasanxuat` varchar(45) not null,
     `nghesi` varchar(20) not null,
@@ -50,11 +51,11 @@ create table `dianhac` (
 );
 
 insert into `dianhac` (`masanpham`,`tensanpham`,`nhasanxuat`,`nghesi`,`thoiluong`,`theloai`,`soluong`,`giamua`,`giaban`,`image`) values
-						(9,"Mint Jams","Alfa Records","Casiopea",150,"jazz fusion",50,15000,20000,"mint.jpg"),
+						(9,"Mint Jams","Alfa Records","Casiopea",150,"jazz fusion",50,15000.4,20000,"mint.jpg"),
 						(10,"The Beatles","George Martin","The Beatles",120,"pop & rock",50,15000,20000,"beatles.png");
 
 create table `diaphim` (
-	`masanpham` int not null,
+	`masanpham` int auto_increment,
     `tensanpham` varchar(45) not null,
     `nhasanxuat` varchar(45) not null,
     `daodien` varchar(20) not null,

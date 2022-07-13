@@ -8,9 +8,12 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.net.URL;
+import java.rmi.ConnectIOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.HashMap;
+import java.sql.ResultSet;
 
 import javax.imageio.ImageIO;
 
@@ -156,12 +159,6 @@ public class addCategoryDVD extends JScrollPane {
 
                                                             try {
 
-                                                                JPanel subPanel = (JPanel) panel.getComponent(1);
-                                                                JPanel subSubPanel = OnlineSelectionScrollPane
-                                                                        .addProductDVD(productName, imageAddress, cost,
-                                                                                quantity, length, directorName,
-                                                                                producerName);
-
                                                                 Connection connection = conn.getConnection();
                                                                 String sql = "insert into diaphim (`tensanpham`,`nhasanxuat`,`daodien`,`thoiluong`,`theloai`, `soluong`,`giamua`,`giaban`,`image`) values(?,?,?,?,?,?,?,?,?)";
                                                                 PreparedStatement ps = connection.prepareStatement(sql);
@@ -178,15 +175,26 @@ public class addCategoryDVD extends JScrollPane {
                                                                 ps.executeUpdate();
                                                                 ps.close();
 
-                                                                subPanel.add(subSubPanel);
-                                                                subPanel.validate();
-                                                                subPanel.repaint();
+                                                                sql = "select `masanpham` from diaphim where `tensanpham` = ?";
+                                                                ps = connection.prepareStatement(sql);
+                                                                ps.setString(1, productName);
+                                                                ResultSet rs = ps.executeQuery();
+                                                                while (rs.next()) {
+                                                                    int id = rs.getInt(1);
+                                                                    JPanel subPanel = (JPanel) panel.getComponent(1);
+                                                                    JPanel subSubPanel = OnlineSelectionScrollPane
+                                                                            .addProductDVD(id, productName,
+                                                                                    imageAddress,
+                                                                                    cost, quantity, length,
+                                                                                    directorName,
+                                                                                    producerName);
+                                                                    subPanel.add(subSubPanel);
+                                                                    subPanel.validate();
+                                                                    subPanel.repaint();
+                                                                }
+
                                                             } catch (ArrayIndexOutOfBoundsException ex) {
-                                                                JPanel subPanel = new JPanel();
-                                                                JPanel subSubPanel = OnlineSelectionScrollPane
-                                                                        .addProductDVD(productName, imageAddress, cost,
-                                                                                quantity, length, directorName,
-                                                                                producerName);
+
                                                                 Connection connection = conn.getConnection();
                                                                 String sql = "insert into diaphim (`tensanpham`,`nhasanxuat`,`daodien`,`thoiluong`,`theloai`, `soluong`,`giamua`,`giaban`,`image`) values(?,?,?,?,?,?,?,?,?)";
                                                                 PreparedStatement ps = connection.prepareStatement(sql);
@@ -202,12 +210,28 @@ public class addCategoryDVD extends JScrollPane {
                                                                 ps.setString(9, imageAddress);
                                                                 ps.executeUpdate();
                                                                 ps.close();
-                                                                subPanel.add(subSubPanel);
-                                                                subPanel.validate();
-                                                                subPanel.repaint();
-                                                                panel.add(subPanel);
-                                                                panel.validate();
-                                                                panel.repaint();
+
+                                                                sql = "select `masanpham` from diaphim where `tensanpham` = ?";
+                                                                ps = connection.prepareStatement(sql);
+                                                                ps.setString(1, productName);
+                                                                ResultSet rs = ps.executeQuery();
+                                                                while (rs.next()) {
+                                                                    int id = rs.getInt(1);
+                                                                    JPanel subPanel = new JPanel();
+                                                                    JPanel subSubPanel = OnlineSelectionScrollPane
+                                                                            .addProductDVD(id, productName,
+                                                                                    imageAddress,
+                                                                                    cost, quantity, length,
+                                                                                    directorName,
+                                                                                    producerName);
+                                                                    subPanel.add(subSubPanel);
+                                                                    subPanel.validate();
+                                                                    subPanel.repaint();
+                                                                    panel.add(subPanel);
+                                                                    panel.validate();
+                                                                    panel.repaint();
+                                                                }
+
                                                             }
                                                         } else {
                                                             JOptionPane.showMessageDialog(null, "Ảnh trống", "ERROR",

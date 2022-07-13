@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -144,14 +146,6 @@ public class addCategoryBook extends JScrollPane {
                                                             Float cost = Float.parseFloat(costText);
 
                                                             try {
-
-                                                                JPanel subPanel = (JPanel) panel.getComponent(1);
-                                                                JPanel subSubPanel = OnlineSelectionScrollPane
-                                                                        .addProductBook(
-                                                                                productName, imageAddress, cost,
-                                                                                quantity, author, producerName,
-                                                                                category);
-
                                                                 Connection connection = conn.getConnection();
                                                                 String sql = "insert into sach (`tensanpham`,`nhaxuatban`,`tacgia`,`theloai`,`soluong`,`giamua`,`giaban`,`image`) values(?,?,?,?,?,?,?,?)";
                                                                 PreparedStatement ps = connection.prepareStatement(sql);
@@ -165,26 +159,59 @@ public class addCategoryBook extends JScrollPane {
                                                                 ps.setFloat(7, cost);
                                                                 ps.setString(8, imageAddress);
                                                                 ps.executeUpdate();
-                                                                System.out.println("check boook123");
-
                                                                 ps.close();
 
-                                                                subPanel.add(subSubPanel);
-                                                                subPanel.validate();
-                                                                subPanel.repaint();
+                                                                sql = "select `masanpham` from sach where `tensanpham` = ?";
+                                                                ps = connection.prepareStatement(sql);
+                                                                ps.setString(1, productName);
+                                                                ResultSet rs = ps.executeQuery();
+                                                                while (rs.next()) {
+                                                                    int id = rs.getInt(1);
+                                                                    JPanel subPanel = (JPanel) panel.getComponent(1);
+                                                                    JPanel subSubPanel = OnlineSelectionScrollPane
+                                                                            .addProductBook(id,
+                                                                                    productName, imageAddress, cost,
+                                                                                    quantity, author, producerName,
+                                                                                    category);
+                                                                    subPanel.add(subSubPanel);
+                                                                    subPanel.validate();
+                                                                    subPanel.repaint();
+                                                                }
                                                             } catch (ArrayIndexOutOfBoundsException ex) {
-                                                                JPanel subPanel = new JPanel();
-                                                                JPanel subSubPanel = OnlineSelectionScrollPane
-                                                                        .addProductBook(
-                                                                                productName, imageAddress, cost,
-                                                                                quantity, author, producerName,
-                                                                                category);
-                                                                subPanel.add(subSubPanel);
-                                                                subPanel.validate();
-                                                                subPanel.repaint();
-                                                                panel.add(subPanel);
-                                                                panel.validate();
-                                                                panel.repaint();
+                                                                Connection connection = conn.getConnection();
+                                                                String sql = "insert into sach (`tensanpham`,`nhaxuatban`,`tacgia`,`theloai`,`soluong`,`giamua`,`giaban`,`image`) values(?,?,?,?,?,?,?,?)";
+                                                                PreparedStatement ps = connection.prepareStatement(sql);
+
+                                                                ps.setString(1, productName);
+                                                                ps.setString(2, producerName);
+                                                                ps.setString(3, directorName);
+                                                                ps.setString(4, category);
+                                                                ps.setInt(5, quantity);
+                                                                ps.setFloat(6, funds);
+                                                                ps.setFloat(7, cost);
+                                                                ps.setString(8, imageAddress);
+                                                                ps.executeUpdate();
+                                                                ps.close();
+
+                                                                sql = "select `masanpham` from sach where `tensanpham` = ?";
+                                                                ps = connection.prepareStatement(sql);
+                                                                ps.setString(1, productName);
+                                                                ResultSet rs = ps.executeQuery();
+                                                                while (rs.next()) {
+                                                                    int id = rs.getInt(1);
+                                                                    JPanel subPanel = new JPanel();
+                                                                    JPanel subSubPanel = OnlineSelectionScrollPane
+                                                                            .addProductBook(id,
+                                                                                    productName, imageAddress, cost,
+                                                                                    quantity, author, producerName,
+                                                                                    category);
+                                                                    subPanel.add(subSubPanel);
+                                                                    subPanel.validate();
+                                                                    subPanel.repaint();
+                                                                    panel.add(subPanel);
+                                                                    panel.validate();
+                                                                    panel.repaint();
+                                                                }
                                                             }
                                                         } else {
                                                             JOptionPane.showMessageDialog(null, "Ảnh trống", "ERROR",

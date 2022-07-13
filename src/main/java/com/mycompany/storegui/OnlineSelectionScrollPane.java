@@ -37,8 +37,10 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
     static {
 
         // make 3 categories
-        addCategoryDVD.addCategory("DVD", "dvd.png", UNDER_EDITING_PANELS, CATEGORIES);
-        addCategoryBook.addCategory("Book", "book.png", UNDER_EDITING_PANELS, CATEGORIES);
+        addCategoryDVD.addCategory("DVD", "dvd.png", UNDER_EDITING_PANELS,
+                CATEGORIES);
+        addCategoryBook.addCategory("Book", "book.png", UNDER_EDITING_PANELS,
+                CATEGORIES);
         addCategoryCD.addCategory("CD", "cd.png", UNDER_EDITING_PANELS, CATEGORIES);
         // addCategory("DVD", "dvd.png");
         // addCategory("Book", "book.png");
@@ -50,7 +52,8 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
             ResultSet rs = stmt.executeQuery("select * from diaphim");
 
             while (rs.next()) {
-                DigitalVideoDisc dvd = new DigitalVideoDisc(rs.getInt(1), rs.getString(2), rs.getString(6),
+                DigitalVideoDisc dvd = new DigitalVideoDisc(rs.getInt(1), rs.getString(2),
+                        rs.getString(6),
                         rs.getInt(5), rs.getString(4), rs.getFloat(9), rs.getInt(7),
                         rs.getString(10), rs.getString(3));
                 Collections.addAll(DVDList, dvd);
@@ -65,7 +68,8 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
             ResultSet rs = stmt.executeQuery("select * from sach");
 
             while (rs.next()) {
-                Book book = new Book(rs.getInt(1), rs.getString(2), rs.getString(5), rs.getFloat(8),
+                Book book = new Book(rs.getInt(1), rs.getString(2), rs.getString(5),
+                        rs.getFloat(8),
                         rs.getString(4), rs.getInt(6), rs.getString(9), rs.getString(3));
                 Collections.addAll(bookList, book);
             }
@@ -80,8 +84,10 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
             while (rs.next()) {
 
-                CompactDisc cd = new CompactDisc(rs.getInt(1), rs.getString(2), rs.getString(6), rs.getString(4),
-                        rs.getInt(5), rs.getFloat(9), rs.getInt(7), rs.getString(10), rs.getString(3));
+                CompactDisc cd = new CompactDisc(rs.getInt(1), rs.getString(2),
+                        rs.getString(6), rs.getString(4),
+                        rs.getInt(5), rs.getFloat(9), rs.getInt(7), rs.getString(10),
+                        rs.getString(3));
                 Collections.addAll(CDList, cd);
             }
         } catch (Exception e) {
@@ -91,7 +97,8 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         // add products to first category
         JPanel panel = new JPanel();
         for (DigitalVideoDisc dvd : DVDList) {
-            panel.add(addProductDVD(dvd.id, dvd.title, dvd.image, dvd.cost, dvd.quantity, dvd.length, dvd.director,
+            panel.add(addProductDVD(dvd.id, dvd.title, dvd.image, dvd.cost, dvd.quantity,
+                    dvd.length, dvd.director,
                     dvd.getProducer()));
         }
         CATEGORIES.get("DVD").add(panel);
@@ -99,7 +106,8 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         // add products to second category
         panel = new JPanel();
         for (Book book : bookList) {
-            panel.add(addProductBook(book.id, book.title, book.image, book.cost, book.quantity, book.getAuthors(),
+            panel.add(addProductBook(book.id, book.title, book.image, book.cost,
+                    book.quantity, book.getAuthors(),
                     book.getPublisher(), book.category));
         }
         CATEGORIES.get("Book").add(panel);
@@ -107,7 +115,8 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         // add products to third category
         panel = new JPanel();
         for (CompactDisc cd : CDList) {
-            panel.add(addProductCD(cd.id, cd.title, cd.image, cd.getArtist(), cd.length, cd.cost, cd.quantity,
+            panel.add(addProductCD(cd.id, cd.title, cd.image, cd.getArtist(), cd.length,
+                    cd.cost, cd.quantity,
                     cd.getDirector(), cd.getTrackList()));
         }
         CATEGORIES.get("CD").add(panel);
@@ -637,8 +646,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
     }
 
     protected static JPanel addProductDVD(int id, String title, String imageAddress, Float cost, int quantity,
-            int length,
-            String director, String producer) {
+            int length, String director, String producer) {
         JPanel panel = new JPanel();
         if (quantity != 0) {
 
@@ -986,6 +994,10 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                                     JOptionPane.YES_NO_OPTION);
                             if (choice == JOptionPane.YES_OPTION) {
                                 try {
+                                    Connection connection = conn.getConnection();
+                                    String sql = "Update dianhac set `tensanpham` = ?, `nhasanxuat` = ?, `nghesi` = ?, `thoiluong` = ?, `theloai` = ?, `soluong` = ?, `giamua` = ?, `giaban` = ?, `image` = ?  where `masanpham` = ?";
+                                    PreparedStatement ps = connection.prepareStatement(sql);
+
                                     String productName = JOptionPane.showInputDialog(null, "Nhập tên sản phẩm");
                                     if (productName == null)
                                         throw new NullPointerException();
@@ -999,6 +1011,10 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                                             .parseFloat((String) JOptionPane.showInputDialog(null, "Nhập giá"));
                                     int quantity = Integer.parseInt((String) JOptionPane.showInputDialog(null,
                                             "Nhập số lượng"));
+
+                                    ps.setInt(1, id);
+                                    ps.executeUpdate();
+                                    ps.close();
                                     if (productName == null || imageAddress == null)
                                         throw new NullPointerException();
 

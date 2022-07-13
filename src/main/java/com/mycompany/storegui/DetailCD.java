@@ -123,6 +123,7 @@ public class DetailCD {
 
                         OnlineSelectionScrollPane.CART.add(new Item(title, imageAddress, cost));
 
+                        MainPanel.setSubContainer(new OnlineSelectionScrollPane());
                         System.out.println("datialcd");
                     }
                 } catch (Exception ex) {

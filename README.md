@@ -1,5 +1,5 @@
-# StoreGUI
-### A simple store app made with java swing as part of second assignment of second semester in my BSCS
+# Media Shop
+### A simple store app made with java swing as project of second semester in my OOP
 
 The app has 1 modes: Onsite
 

@@ -91,7 +91,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         // add products to first category
         JPanel panel = new JPanel();
         for (DigitalVideoDisc dvd : DVDList) {
-            panel.add(addProductDVD(dvd.title, dvd.image, dvd.cost, dvd.quantity, dvd.length, dvd.director,
+            panel.add(addProductDVD(dvd.id, dvd.title, dvd.image, dvd.cost, dvd.quantity, dvd.length, dvd.director,
                     dvd.getProducer()));
         }
         CATEGORIES.get("DVD").add(panel);
@@ -99,7 +99,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         // add products to second category
         panel = new JPanel();
         for (Book book : bookList) {
-            panel.add(addProductBook(book.title, book.image, book.cost, book.quantity, book.getAuthors(),
+            panel.add(addProductBook(book.id, book.title, book.image, book.cost, book.quantity, book.getAuthors(),
                     book.getPublisher(), book.category));
         }
         CATEGORIES.get("Book").add(panel);
@@ -636,249 +636,285 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         return panel;
     }
 
-    protected static JPanel addProductDVD(String title, String imageAddress, Float cost, int quantity, int length,
+    protected static JPanel addProductDVD(int id, String title, String imageAddress, Float cost, int quantity,
+            int length,
             String director, String producer) {
         JPanel panel = new JPanel();
-        BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
-        panel.setLayout(layout);
-        JLabel tempLabel;
-        try {
-            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
-            tempLabel = new JLabel(title, new ImageIcon(ImageIO.read(url)), JLabel.CENTER);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR", JOptionPane.ERROR_MESSAGE);
-            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
-            tempLabel = new JLabel(title, new ImageIcon(url), JLabel.CENTER);
-        }
+        if (quantity != 0) {
 
-        JLabel imageNameLabel = tempLabel;
-        imageNameLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
-        imageNameLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-        imageNameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
-        panel.add(imageNameLabel);
+            BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
+            panel.setLayout(layout);
+            JLabel tempLabel;
+            try {
+                URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
+                tempLabel = new JLabel(title, new ImageIcon(ImageIO.read(url)), JLabel.CENTER);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR", JOptionPane.ERROR_MESSAGE);
+                URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
+                tempLabel = new JLabel(title, new ImageIcon(url), JLabel.CENTER);
+            }
 
-        String costText = "Giá: " + cost;
-        JLabel costLabel = new JLabel(costText);
-        costLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
+            JLabel imageNameLabel = tempLabel;
+            imageNameLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
+            imageNameLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+            imageNameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
+            panel.add(imageNameLabel);
 
-        String quantityText = "Số lượng: " + quantity;
-        JLabel quantityLabel = new JLabel(quantityText);
+            String costText = "Giá: " + cost;
+            JLabel costLabel = new JLabel(costText);
+            costLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
 
-        String lengthText = "Độ dài: " + length;
-        JLabel lengthLabel = new JLabel(lengthText);
+            String quantityText = "Số lượng: " + quantity;
+            JLabel quantityLabel = new JLabel(quantityText);
 
-        panel.add(costLabel);
-        panel.add(quantityLabel);
-        panel.add(lengthLabel);
-        panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
-        panel.validate();
-        panel.repaint();
+            String lengthText = "Độ dài: " + length;
+            JLabel lengthLabel = new JLabel(lengthText);
 
-        panel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (OnlineLoginPanel.isAdminAccess()) {
-                    if (!e.isMetaDown()) {// if not right click
-                        int choice = JOptionPane.showConfirmDialog(null, "Xóa ?", "Confirmation",
-                                JOptionPane.YES_NO_OPTION);
-                        if (choice == JOptionPane.YES_OPTION) {
-                            JPanel parentPanel = (JPanel) panel.getParent();
-                            parentPanel.remove(panel);
-                            parentPanel.validate();
-                            parentPanel.repaint();
-                        }
-                    }
+            panel.add(costLabel);
+            panel.add(quantityLabel);
+            panel.add(lengthLabel);
+            panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
+            panel.validate();
+            panel.repaint();
 
-                    else { // if right click
-                        int choice = JOptionPane.showConfirmDialog(null, "Cập nhật sản phẩm ?", "Confirmation",
-                                JOptionPane.YES_NO_OPTION);
-                        if (choice == JOptionPane.YES_OPTION) {
-                            try {
-                                String productName = JOptionPane.showInputDialog(null, "Nhập tên sản phẩm");
-                                if (productName == null)
-                                    throw new NullPointerException();
+            panel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (OnlineLoginPanel.isAdminAccess()) {
+                        if (!e.isMetaDown()) {// if not right click
+                            int choice = JOptionPane.showConfirmDialog(null, "Xóa ?", "Confirmation",
+                                    JOptionPane.YES_NO_OPTION);
+                            if (choice == JOptionPane.YES_OPTION) {
+                                try {
+                                    Connection connection = conn.getConnection();
+                                    String sql = "delete from diaphim where `masanpham` = ?";
+                                    PreparedStatement ps = connection.prepareStatement(sql);
+                                    ps.setInt(1, id);
+                                    ps.executeUpdate();
+                                    ps.close();
+                                    JPanel parentPanel = (JPanel) panel.getParent();
+                                    parentPanel.remove(panel);
+                                    parentPanel.validate();
+                                    parentPanel.repaint();
+                                } catch (Exception ex) {
+                                    // TODO: handle exception
+                                }
 
-                                String imageAddress = JOptionPane.showInputDialog(null, "Nhập địa chỉ ảnh minh họa");
-                                if (imageAddress == null)
-                                    throw new NullPointerException();
-
-                                float cost = Float.parseFloat((String) JOptionPane.showInputDialog(null, "Nhập giá"));
-                                int quantity = Integer.parseInt((String) JOptionPane.showInputDialog(null,
-                                        "Enter quantity(it will be displayed as cost per quantity)"));
-                                if (productName == null || imageAddress == null)
-                                    throw new NullPointerException();
-
-                                URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
-                                File file = new File(imageAddress);
-                                imageNameLabel.setText(productName);
-                                imageNameLabel.setIcon(new ImageIcon(ImageIO.read(url)));
-
-                                costLabel.setText("" + cost);
-                                quantityLabel.setText("" + quantity);
-                            } catch (NumberFormatException ex) {
-                                JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ", "ERROR",
-                                        JOptionPane.ERROR_MESSAGE);
-                            } catch (IOException ex) {
-                                JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                        JOptionPane.ERROR_MESSAGE);
-                            } catch (NullPointerException ex) {
-                                JOptionPane.showMessageDialog(null, "Operation Cancelled");
-                            } catch (Exception ex) {
-                                JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                        JOptionPane.ERROR_MESSAGE);
                             }
                         }
 
+                        else { // if right click
+                            int choice = JOptionPane.showConfirmDialog(null, "Cập nhật sản phẩm ?", "Confirmation",
+                                    JOptionPane.YES_NO_OPTION);
+                            if (choice == JOptionPane.YES_OPTION) {
+                                try {
+                                    String productName = JOptionPane.showInputDialog(null, "Nhập tên sản phẩm");
+                                    if (productName == null)
+                                        throw new NullPointerException();
+
+                                    String imageAddress = JOptionPane.showInputDialog(null,
+                                            "Nhập địa chỉ ảnh minh họa");
+                                    if (imageAddress == null)
+                                        throw new NullPointerException();
+
+                                    float cost = Float
+                                            .parseFloat((String) JOptionPane.showInputDialog(null, "Nhập giá"));
+                                    int quantity = Integer.parseInt((String) JOptionPane.showInputDialog(null,
+                                            "Enter quantity(it will be displayed as cost per quantity)"));
+                                    if (productName == null || imageAddress == null)
+                                        throw new NullPointerException();
+
+                                    URL url = OnlineSelectionScrollPane.class.getClassLoader()
+                                            .getResource(imageAddress);
+                                    File file = new File(imageAddress);
+                                    imageNameLabel.setText(productName);
+                                    imageNameLabel.setIcon(new ImageIcon(ImageIO.read(url)));
+
+                                    costLabel.setText("" + cost);
+                                    quantityLabel.setText("" + quantity);
+                                } catch (NumberFormatException ex) {
+                                    JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ", "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                                } catch (IOException ex) {
+                                    JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                                } catch (NullPointerException ex) {
+                                    JOptionPane.showMessageDialog(null, "Operation Cancelled");
+                                } catch (Exception ex) {
+                                    JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                                }
+                            }
+
+                        }
+
+                    } else { // if not admin access
+
+                        DetailDVD detail = new DetailDVD(title, imageAddress, cost, quantity, length, director,
+                                producer);
+                        // test detail = new test(productName, imageAddress, cost, quantity);
                     }
-
-                } else { // if not admin access
-
-                    DetailDVD detail = new DetailDVD(title, imageAddress, cost, quantity, length, director, producer);
-                    // test detail = new test(productName, imageAddress, cost, quantity);
                 }
-            }
 
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                panel.setBackground(Color.pink);
-                panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.red));
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    panel.setBackground(Color.pink);
+                    panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.red));
 
-                if (OnlineLoginPanel.isAdminAccess())
-                    panel.setToolTipText("Nhấp chuột trái để xóa. Nhấp chuột phải để chỉnh sửa");
+                    if (OnlineLoginPanel.isAdminAccess())
+                        panel.setToolTipText("Nhấp chuột trái để xóa. Nhấp chuột phải để chỉnh sửa");
 
-                else
-                    panel.setToolTipText("Bấm vào để mua");
-            }
+                    else
+                        panel.setToolTipText("Bấm vào để mua");
+                }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                panel.setBackground(null);
-                panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
-            }
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    panel.setBackground(null);
+                    panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
+                }
 
-        });
+            });
+
+        }
         return panel;
 
     }
 
-    protected static JPanel addProductBook(String title, String imageAddress, Float cost, int quantity,
+    protected static JPanel addProductBook(int id, String title, String imageAddress, Float cost, int quantity,
             List<String> authors, String publisher, String category) {
         JPanel panel = new JPanel();
-        BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
-        panel.setLayout(layout);
-        JLabel tempLabel;
-        try {
-            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
-            tempLabel = new JLabel(title, new ImageIcon(ImageIO.read(url)), JLabel.CENTER);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR", JOptionPane.ERROR_MESSAGE);
-            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
-            tempLabel = new JLabel(title, new ImageIcon(url), JLabel.CENTER);
-        }
+        if (quantity != 0) {
+            BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
+            panel.setLayout(layout);
+            JLabel tempLabel;
+            try {
+                URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
+                tempLabel = new JLabel(title, new ImageIcon(ImageIO.read(url)), JLabel.CENTER);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR", JOptionPane.ERROR_MESSAGE);
+                URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
+                tempLabel = new JLabel(title, new ImageIcon(url), JLabel.CENTER);
+            }
 
-        JLabel imageNameLabel = tempLabel;
-        imageNameLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
-        imageNameLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-        imageNameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
-        panel.add(imageNameLabel);
+            JLabel imageNameLabel = tempLabel;
+            imageNameLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
+            imageNameLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+            imageNameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
+            panel.add(imageNameLabel);
 
-        String costText = "Giá: " + cost;
-        JLabel costLabel = new JLabel(costText);
-        costLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
+            String costText = "Giá: " + cost;
+            JLabel costLabel = new JLabel(costText);
+            costLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
 
-        String quantityText = "Số lượng: " + quantity;
-        JLabel quantityLabel = new JLabel(quantityText);
+            String quantityText = "Số lượng: " + quantity;
+            JLabel quantityLabel = new JLabel(quantityText);
 
-        panel.add(costLabel);
-        panel.add(quantityLabel);
-        panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
-        panel.validate();
-        panel.repaint();
+            panel.add(costLabel);
+            panel.add(quantityLabel);
+            panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
+            panel.validate();
+            panel.repaint();
 
-        panel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (OnlineLoginPanel.isAdminAccess()) {
-                    if (!e.isMetaDown()) {// if not right click
-                        int choice = JOptionPane.showConfirmDialog(null, "Xóa ?", "Confirmation",
-                                JOptionPane.YES_NO_OPTION);
-                        if (choice == JOptionPane.YES_OPTION) {
-                            JPanel parentPanel = (JPanel) panel.getParent();
-                            parentPanel.remove(panel);
-                            parentPanel.validate();
-                            parentPanel.repaint();
-                        }
-                    }
+            panel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (OnlineLoginPanel.isAdminAccess()) {
+                        if (!e.isMetaDown()) {// if not right click
+                            int choice = JOptionPane.showConfirmDialog(null, "Xóa ?", "Confirmation",
+                                    JOptionPane.YES_NO_OPTION);
+                            if (choice == JOptionPane.YES_OPTION) {
+                                try {
+                                    Connection connection = conn.getConnection();
+                                    String sql = "delete from sach where `masanpham` = ?";
+                                    PreparedStatement ps = connection.prepareStatement(sql);
+                                    ps.setInt(1, id);
+                                    ps.executeUpdate();
+                                    ps.close();
+                                    JPanel parentPanel = (JPanel) panel.getParent();
+                                    parentPanel.remove(panel);
+                                    parentPanel.validate();
+                                    parentPanel.repaint();
+                                } catch (Exception ex) {
+                                    // TODO: handle exception
+                                }
 
-                    else { // if right click
-                        int choice = JOptionPane.showConfirmDialog(null, "Cập nhật sản phẩm ?", "Confirmation",
-                                JOptionPane.YES_NO_OPTION);
-                        if (choice == JOptionPane.YES_OPTION) {
-                            try {
-                                String productName = JOptionPane.showInputDialog(null, "Nhập tên sản phẩm");
-                                if (productName == null)
-                                    throw new NullPointerException();
-
-                                String imageAddress = JOptionPane.showInputDialog(null, "Nhập địa chỉ ảnh minh họa");
-                                if (imageAddress == null)
-                                    throw new NullPointerException();
-
-                                float cost = Float.parseFloat((String) JOptionPane.showInputDialog(null, "Nhập giá"));
-                                int quantity = Integer.parseInt((String) JOptionPane.showInputDialog(null,
-                                        "Nhập số lượng"));
-                                if (productName == null || imageAddress == null)
-                                    throw new NullPointerException();
-
-                                URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
-                                File file = new File(imageAddress);
-                                imageNameLabel.setText(productName);
-                                imageNameLabel.setIcon(new ImageIcon(ImageIO.read(url)));
-
-                                costLabel.setText("" + cost);
-                                quantityLabel.setText("" + quantity);
-                            } catch (NumberFormatException ex) {
-                                JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ", "ERROR",
-                                        JOptionPane.ERROR_MESSAGE);
-                            } catch (IOException ex) {
-                                JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                        JOptionPane.ERROR_MESSAGE);
-                            } catch (NullPointerException ex) {
-                                JOptionPane.showMessageDialog(null, "Operation Cancelled");
-                            } catch (Exception ex) {
-                                JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                        JOptionPane.ERROR_MESSAGE);
                             }
                         }
 
+                        else { // if right click
+                            int choice = JOptionPane.showConfirmDialog(null, "Cập nhật sản phẩm ?", "Confirmation",
+                                    JOptionPane.YES_NO_OPTION);
+                            if (choice == JOptionPane.YES_OPTION) {
+                                try {
+                                    String productName = JOptionPane.showInputDialog(null, "Nhập tên sản phẩm");
+                                    if (productName == null)
+                                        throw new NullPointerException();
+
+                                    String imageAddress = JOptionPane.showInputDialog(null,
+                                            "Nhập địa chỉ ảnh minh họa");
+                                    if (imageAddress == null)
+                                        throw new NullPointerException();
+
+                                    float cost = Float
+                                            .parseFloat((String) JOptionPane.showInputDialog(null, "Nhập giá"));
+                                    int quantity = Integer.parseInt((String) JOptionPane.showInputDialog(null,
+                                            "Nhập số lượng"));
+                                    if (productName == null || imageAddress == null)
+                                        throw new NullPointerException();
+
+                                    URL url = OnlineSelectionScrollPane.class.getClassLoader()
+                                            .getResource(imageAddress);
+                                    File file = new File(imageAddress);
+                                    imageNameLabel.setText(productName);
+                                    imageNameLabel.setIcon(new ImageIcon(ImageIO.read(url)));
+
+                                    costLabel.setText("" + cost);
+                                    quantityLabel.setText("" + quantity);
+                                } catch (NumberFormatException ex) {
+                                    JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ", "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                                } catch (IOException ex) {
+                                    JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                                } catch (NullPointerException ex) {
+                                    JOptionPane.showMessageDialog(null, "Operation Cancelled");
+                                } catch (Exception ex) {
+                                    JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                                }
+                            }
+
+                        }
+
+                    } else { // if not admin access
+
+                        DetailBook detail = new DetailBook(title, imageAddress, cost, quantity, authors, publisher,
+                                category);
+                        // test detail = new test(productName, imageAddress, cost, quantity);
                     }
-
-                } else { // if not admin access
-
-                    DetailBook detail = new DetailBook(title, imageAddress, cost, quantity, authors, publisher,
-                            category);
-                    // test detail = new test(productName, imageAddress, cost, quantity);
                 }
-            }
 
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                panel.setBackground(Color.pink);
-                panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.red));
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    panel.setBackground(Color.pink);
+                    panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.red));
 
-                if (OnlineLoginPanel.isAdminAccess())
-                    panel.setToolTipText("Nhấp chuột trái để xóa. Nhấp chuột phải để chỉnh sửa");
+                    if (OnlineLoginPanel.isAdminAccess())
+                        panel.setToolTipText("Nhấp chuột trái để xóa. Nhấp chuột phải để chỉnh sửa");
 
-                else
-                    panel.setToolTipText("Bấm vào để mua");
-            }
+                    else
+                        panel.setToolTipText("Bấm vào để mua");
+                }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                panel.setBackground(null);
-                panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
-            }
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    panel.setBackground(null);
+                    panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
+                }
 
-        });
+            });
+        }
         return panel;
 
     }
@@ -886,120 +922,138 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
     protected static JPanel addProductCD(int id, String title, String imageAddress, String director, int length,
             Float cost, int quantity, String artist, List<Track> trackList) {
         JPanel panel = new JPanel();
-        BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
-        panel.setLayout(layout);
-        JLabel tempLabel;
-        try {
-            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
-            tempLabel = new JLabel(title, new ImageIcon(ImageIO.read(url)), JLabel.CENTER);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR", JOptionPane.ERROR_MESSAGE);
-            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
-            tempLabel = new JLabel(title, new ImageIcon(url), JLabel.CENTER);
-        }
+        if (quantity != 0) {
+            BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
+            panel.setLayout(layout);
+            JLabel tempLabel;
+            try {
+                URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
+                tempLabel = new JLabel(title, new ImageIcon(ImageIO.read(url)), JLabel.CENTER);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR", JOptionPane.ERROR_MESSAGE);
+                URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
+                tempLabel = new JLabel(title, new ImageIcon(url), JLabel.CENTER);
+            }
 
-        JLabel imageNameLabel = tempLabel;
-        imageNameLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
-        imageNameLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-        imageNameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
-        panel.add(imageNameLabel);
+            JLabel imageNameLabel = tempLabel;
+            imageNameLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
+            imageNameLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+            imageNameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
+            panel.add(imageNameLabel);
 
-        String costText = "Giá: " + cost;
-        JLabel costLabel = new JLabel(costText);
-        costLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
+            String costText = "Giá: " + cost;
+            JLabel costLabel = new JLabel(costText);
+            costLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
 
-        String quantityText = "Số lượng: " + quantity;
-        JLabel quantityLabel = new JLabel(quantityText);
+            String quantityText = "Số lượng: " + quantity;
+            JLabel quantityLabel = new JLabel(quantityText);
 
-        panel.add(costLabel);
-        panel.add(quantityLabel);
-        panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
-        panel.validate();
-        panel.repaint();
+            panel.add(costLabel);
+            panel.add(quantityLabel);
+            panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
+            panel.validate();
+            panel.repaint();
 
-        panel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (OnlineLoginPanel.isAdminAccess()) {
-                    if (!e.isMetaDown()) {// if not right click
-                        int choice = JOptionPane.showConfirmDialog(null, "Xóa ?", "Confirmation",
-                                JOptionPane.YES_NO_OPTION);
-                        if (choice == JOptionPane.YES_OPTION) {
-                            JPanel parentPanel = (JPanel) panel.getParent();
-                            parentPanel.remove(panel);
-                            parentPanel.validate();
-                            parentPanel.repaint();
-                        }
-                    }
+            panel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (OnlineLoginPanel.isAdminAccess()) {
+                        if (!e.isMetaDown()) {// if not right click
+                            int choice = JOptionPane.showConfirmDialog(null, "Xóa ?", "Confirmation",
+                                    JOptionPane.YES_NO_OPTION);
+                            if (choice == JOptionPane.YES_OPTION) {
+                                try {
+                                    Connection connection = conn.getConnection();
+                                    String sql = "delete from dianhac where `masanpham` = ?";
+                                    PreparedStatement ps = connection.prepareStatement(sql);
+                                    ps.setInt(1, id);
+                                    ps.executeUpdate();
+                                    ps.close();
+                                    // System.out.println("check delete cd");
+                                    JPanel parentPanel = (JPanel) panel.getParent();
+                                    parentPanel.remove(panel);
+                                    parentPanel.validate();
+                                    parentPanel.repaint();
+                                } catch (Exception ex) {
+                                    // TODO: handle exception
+                                }
 
-                    else { // if right click
-                        int choice = JOptionPane.showConfirmDialog(null, "Cập nhật sản phẩm ?", "Confirmation",
-                                JOptionPane.YES_NO_OPTION);
-                        if (choice == JOptionPane.YES_OPTION) {
-                            try {
-                                String productName = JOptionPane.showInputDialog(null, "Nhập tên sản phẩm");
-                                if (productName == null)
-                                    throw new NullPointerException();
-
-                                String imageAddress = JOptionPane.showInputDialog(null, "Nhập địa chỉ ảnh minh họa");
-                                if (imageAddress == null)
-                                    throw new NullPointerException();
-
-                                float cost = Float.parseFloat((String) JOptionPane.showInputDialog(null, "Nhập giá"));
-                                int quantity = Integer.parseInt((String) JOptionPane.showInputDialog(null,
-                                        "Nhập số lượng"));
-                                if (productName == null || imageAddress == null)
-                                    throw new NullPointerException();
-
-                                URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource(imageAddress);
-                                File file = new File(imageAddress);
-                                imageNameLabel.setText(productName);
-                                imageNameLabel.setIcon(new ImageIcon(ImageIO.read(url)));
-
-                                costLabel.setText("" + cost);
-                                quantityLabel.setText("" + quantity);
-                            } catch (NumberFormatException ex) {
-                                JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ", "ERROR",
-                                        JOptionPane.ERROR_MESSAGE);
-                            } catch (IOException ex) {
-                                JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                        JOptionPane.ERROR_MESSAGE);
-                            } catch (NullPointerException ex) {
-                                JOptionPane.showMessageDialog(null, "Operation Cancelled");
-                            } catch (Exception ex) {
-                                JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                        JOptionPane.ERROR_MESSAGE);
                             }
                         }
 
+                        else { // if right click
+                            int choice = JOptionPane.showConfirmDialog(null, "Cập nhật sản phẩm ?", "Confirmation",
+                                    JOptionPane.YES_NO_OPTION);
+                            if (choice == JOptionPane.YES_OPTION) {
+                                try {
+                                    String productName = JOptionPane.showInputDialog(null, "Nhập tên sản phẩm");
+                                    if (productName == null)
+                                        throw new NullPointerException();
+
+                                    String imageAddress = JOptionPane.showInputDialog(null,
+                                            "Nhập địa chỉ ảnh minh họa");
+                                    if (imageAddress == null)
+                                        throw new NullPointerException();
+
+                                    float cost = Float
+                                            .parseFloat((String) JOptionPane.showInputDialog(null, "Nhập giá"));
+                                    int quantity = Integer.parseInt((String) JOptionPane.showInputDialog(null,
+                                            "Nhập số lượng"));
+                                    if (productName == null || imageAddress == null)
+                                        throw new NullPointerException();
+
+                                    URL url = OnlineSelectionScrollPane.class.getClassLoader()
+                                            .getResource(imageAddress);
+                                    File file = new File(imageAddress);
+                                    imageNameLabel.setText(productName);
+                                    imageNameLabel.setIcon(new ImageIcon(ImageIO.read(url)));
+
+                                    costLabel.setText("" + cost);
+                                    quantityLabel.setText("" + quantity);
+                                } catch (NumberFormatException ex) {
+                                    JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ", "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                                } catch (IOException ex) {
+                                    JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                                } catch (NullPointerException ex) {
+                                    JOptionPane.showMessageDialog(null, "Operation Cancelled");
+                                } catch (Exception ex) {
+                                    JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
+                                            JOptionPane.ERROR_MESSAGE);
+                                }
+                            }
+
+                        }
+
+                    } else { // if not admin access
+
+                        DetailCD detail = new DetailCD(id, title, imageAddress, director, length, cost, quantity,
+                                artist,
+                                trackList);
                     }
-
-                } else { // if not admin access
-
-                    DetailCD detail = new DetailCD(id, title, imageAddress, director, length, cost, quantity, artist,
-                            trackList);
                 }
-            }
 
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                panel.setBackground(Color.pink);
-                panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.red));
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    panel.setBackground(Color.pink);
+                    panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.red));
 
-                if (OnlineLoginPanel.isAdminAccess())
-                    panel.setToolTipText("Nhấp chuột trái để xóa. Nhấp chuột phải để chỉnh sửa");
+                    if (OnlineLoginPanel.isAdminAccess())
+                        panel.setToolTipText("Nhấp chuột trái để xóa. Nhấp chuột phải để chỉnh sửa");
 
-                else
-                    panel.setToolTipText("Bấm vào để mua");
-            }
+                    else
+                        panel.setToolTipText("Bấm vào để mua");
+                }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                panel.setBackground(null);
-                panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
-            }
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    panel.setBackground(null);
+                    panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
+                }
 
-        });
+            });
+        }
         return panel;
 
     }

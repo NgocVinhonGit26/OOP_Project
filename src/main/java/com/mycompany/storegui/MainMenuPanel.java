@@ -29,7 +29,7 @@ public class MainMenuPanel extends JPanel {
         constraints = new GridBagConstraints();
         setLayout(new GridBagLayout());
 
-        label = new JLabel("Welcome to Media Shop", SwingConstants.CENTER);
+        label = new JLabel("Welcome to Media Shop", JLabel.CENTER);
         label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 40));
         label.setForeground(Color.cyan);
         constraints.fill = GridBagConstraints.HORIZONTAL;

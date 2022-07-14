@@ -716,41 +716,153 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                                     JOptionPane.YES_NO_OPTION);
                             if (choice == JOptionPane.YES_OPTION) {
                                 try {
-                                    String productName = JOptionPane.showInputDialog(null, "Nhập tên sản phẩm");
-                                    if (productName == null)
-                                        throw new NullPointerException();
+                                    Connection connection = conn.getConnection();
+                                    String sql = "select * from diaphim where `masanpham` = ?";
+                                    PreparedStatement ps = connection.prepareStatement(sql);
 
-                                    String imageAddress = JOptionPane.showInputDialog(null,
-                                            "Nhập địa chỉ ảnh minh họa");
-                                    if (imageAddress == null)
-                                        throw new NullPointerException();
+                                    ps.setInt(1, id);
+                                    ResultSet rs = ps.executeQuery();
 
-                                    float cost = Float
-                                            .parseFloat((String) JOptionPane.showInputDialog(null, "Nhập giá"));
-                                    int quantity = Integer.parseInt((String) JOptionPane.showInputDialog(null,
-                                            "Enter quantity(it will be displayed as cost per quantity)"));
-                                    if (productName == null || imageAddress == null)
-                                        throw new NullPointerException();
+                                    while (rs.next()) {
 
-                                    URL url = OnlineSelectionScrollPane.class.getClassLoader()
-                                            .getResource(imageAddress);
-                                    File file = new File(imageAddress);
-                                    imageNameLabel.setText(productName);
-                                    imageNameLabel.setIcon(new ImageIcon(ImageIO.read(url)));
+                                        // dang do
+                                        String productName = JOptionPane.showInputDialog("Nhập tên sản phẩm",
+                                                rs.getString(2));
+                                        if (!productName.isBlank()) {
+                                            String producerName = JOptionPane.showInputDialog("Nhập tên nhà sản xuất",
+                                                    rs.getString(3));
+                                            if (!producerName.isBlank()) {
+                                                String directorName = JOptionPane.showInputDialog("Nhập tên đạo diễn",
+                                                        rs.getString(4));
+                                                if (!directorName.isBlank()) {
+                                                    String lengthText = JOptionPane
+                                                            .showInputDialog("Nhập thời lượng phim", rs.getInt(5));
+                                                    if (lengthText.isBlank()) {
+                                                        JOptionPane.showMessageDialog(null, "Thời lượng không hợp lệ",
+                                                                "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                    }
+                                                    for (char c : lengthText.toCharArray()) { // ktra co phai la so hay
+                                                                                              // khong
+                                                        if (!Character.isDigit(c)) {
+                                                            JOptionPane.showMessageDialog(null,
+                                                                    "Thời lượng không hợp lệ",
+                                                                    "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                            break;
+                                                        }
+                                                    }
+                                                    int length = Integer.parseInt(lengthText);
+                                                    String category = JOptionPane.showInputDialog("Nhập thể loại phim",
+                                                            rs.getString(6));
+                                                    if (!category.isBlank()) {
+                                                        String quantityText = JOptionPane
+                                                                .showInputDialog("Nhập số lượng", rs.getString(7));
+                                                        if (quantityText.isBlank()) {
+                                                            JOptionPane.showMessageDialog(null,
+                                                                    "Số lượng không hợp lệ",
+                                                                    "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                        }
+                                                        for (char c : quantityText.toCharArray()) {
+                                                            if ((!Character.isDigit(c))) {
+                                                                JOptionPane.showMessageDialog(null,
+                                                                        "Số lượng không hợp lệ", "ERROR",
+                                                                        JOptionPane.ERROR_MESSAGE);
+                                                                break;
+                                                            }
+                                                        }
+                                                        int quantity = Integer.parseInt(quantityText);
 
-                                    costLabel.setText("" + cost);
-                                    quantityLabel.setText("" + quantity);
-                                } catch (NumberFormatException ex) {
-                                    JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ", "ERROR",
-                                            JOptionPane.ERROR_MESSAGE);
-                                } catch (IOException ex) {
-                                    JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                            JOptionPane.ERROR_MESSAGE);
-                                } catch (NullPointerException ex) {
-                                    JOptionPane.showMessageDialog(null, "Operation Cancelled");
+                                                        String imageAddress = JOptionPane
+                                                                .showInputDialog("Nhập địa chỉ hình ảnh",
+                                                                        rs.getString(10));
+                                                        if (!imageAddress.isBlank()) {
+                                                            String fundsText = JOptionPane
+                                                                    .showInputDialog("Nhập giá mua vào", rs.getInt(8));
+                                                            if (fundsText.isBlank()) {
+                                                                JOptionPane.showMessageDialog(null, "Giá hợp lệ",
+                                                                        "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                            }
+                                                            for (char c : fundsText.toCharArray()) {
+                                                                if (!Character.isDigit(c)) {
+                                                                    JOptionPane.showMessageDialog(null, "Giá hợp lệ",
+                                                                            "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                                    break;
+                                                                }
+                                                            }
+                                                            Float funds = Float.parseFloat(fundsText);
+
+                                                            String costText = JOptionPane
+                                                                    .showInputDialog("Nhập giá bán ra", rs.getInt(9));
+                                                            if (costText.isBlank()) {
+                                                                JOptionPane.showMessageDialog(null, "Giá không hợp lệ",
+                                                                        "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                            }
+                                                            for (char c : costText.toCharArray()) {
+                                                                if (!Character.isDigit(c)) {
+                                                                    JOptionPane.showMessageDialog(null,
+                                                                            "Giá không hợp lệ",
+                                                                            "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                                    break;
+                                                                }
+                                                            }
+                                                            Float cost = Float.parseFloat(costText);
+
+                                                            try {
+
+                                                                connection = conn.getConnection();
+                                                                sql = "update diaphim set `tensanpham` = ?,`nhasanxuat` = ?,`daodien` = ?,`thoiluong` = ?,`theloai` = ?, `soluong` = ?,`giamua` = ?,`giaban` = ?,`image` = ? where `masanpham` = ?";
+                                                                ps = connection.prepareStatement(sql);
+
+                                                                ps.setString(1, productName);
+                                                                ps.setString(2, producerName);
+                                                                ps.setString(3, directorName);
+                                                                ps.setInt(4, length);
+                                                                ps.setString(5, category);
+                                                                ps.setInt(6, quantity);
+                                                                ps.setFloat(7, funds);
+                                                                ps.setFloat(8, cost);
+                                                                ps.setString(9, imageAddress);
+                                                                ps.setInt(10, id);
+                                                                ps.executeUpdate();
+                                                                ps.close();
+
+                                                            } catch (ArrayIndexOutOfBoundsException ex) {
+
+                                                            }
+                                                        } else {
+                                                            JOptionPane.showMessageDialog(null, "Ảnh trống", "ERROR",
+                                                                    JOptionPane.ERROR_MESSAGE);
+                                                        }
+                                                    } else {
+                                                        JOptionPane.showMessageDialog(null,
+                                                                "Chưa nhập thể loại phim", "ERROR",
+                                                                JOptionPane.ERROR_MESSAGE);
+                                                    }
+                                                } else {
+                                                    JOptionPane.showMessageDialog(null, "Chưa nhập tên đạo diễn",
+                                                            "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                }
+                                            } else {
+                                                JOptionPane.showMessageDialog(null, "Chưa nhập tên nhà sản xuất",
+                                                        "ERROR",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                            }
+                                        } else {
+                                            JOptionPane.showMessageDialog(null, "Chưa nhập tên phim", "ERROR",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                        }
+
+                                        if (productName == null || imageAddress == null)
+                                            throw new NullPointerException();
+                                    }
+
+                                    // if(productName == null){
+                                    // JOptionPane.showMessageDialog(null, "Tên không hợp lệ", "ERROR",
+                                    // JOptionPane.ERROR_MESSAGE);
+                                    // }
+                                    // System.out.println("1" + productName + "1");
+
                                 } catch (Exception ex) {
-                                    JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                            JOptionPane.ERROR_MESSAGE);
+
                                 }
                             }
 
@@ -855,41 +967,139 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                                     JOptionPane.YES_NO_OPTION);
                             if (choice == JOptionPane.YES_OPTION) {
                                 try {
-                                    String productName = JOptionPane.showInputDialog(null, "Nhập tên sản phẩm");
-                                    if (productName == null)
-                                        throw new NullPointerException();
+                                    Connection connection = conn.getConnection();
+                                    String sql = "select * from sach where `masanpham` = ?";
+                                    PreparedStatement ps = connection.prepareStatement(sql);
 
-                                    String imageAddress = JOptionPane.showInputDialog(null,
-                                            "Nhập địa chỉ ảnh minh họa");
-                                    if (imageAddress == null)
-                                        throw new NullPointerException();
+                                    ps.setInt(1, id);
+                                    ResultSet rs = ps.executeQuery();
 
-                                    float cost = Float
-                                            .parseFloat((String) JOptionPane.showInputDialog(null, "Nhập giá"));
-                                    int quantity = Integer.parseInt((String) JOptionPane.showInputDialog(null,
-                                            "Nhập số lượng"));
-                                    if (productName == null || imageAddress == null)
-                                        throw new NullPointerException();
+                                    while (rs.next()) {
 
-                                    URL url = OnlineSelectionScrollPane.class.getClassLoader()
-                                            .getResource(imageAddress);
-                                    File file = new File(imageAddress);
-                                    imageNameLabel.setText(productName);
-                                    imageNameLabel.setIcon(new ImageIcon(ImageIO.read(url)));
+                                        // dang do
+                                        String productName = JOptionPane.showInputDialog("Nhập tên sản phẩm",
+                                                rs.getString(2));
+                                        if (!productName.isBlank()) {
+                                            String producerName = JOptionPane.showInputDialog("Nhập tên nhà xuất bản",
+                                                    rs.getString(3));
+                                            if (!producerName.isBlank()) {
+                                                String directorName = JOptionPane.showInputDialog("Nhập tên tác giả",
+                                                        rs.getString(4));
+                                                List<String> author = new ArrayList<String>();
+                                                author.add(directorName);
+                                                if (!directorName.isBlank()) {
 
-                                    costLabel.setText("" + cost);
-                                    quantityLabel.setText("" + quantity);
-                                } catch (NumberFormatException ex) {
-                                    JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ", "ERROR",
-                                            JOptionPane.ERROR_MESSAGE);
-                                } catch (IOException ex) {
-                                    JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                            JOptionPane.ERROR_MESSAGE);
-                                } catch (NullPointerException ex) {
-                                    JOptionPane.showMessageDialog(null, "Operation Cancelled");
+                                                    String category = JOptionPane.showInputDialog("Nhập loại sách",
+                                                            rs.getString(5));
+                                                    if (!category.isBlank()) {
+                                                        String quantityText = JOptionPane
+                                                                .showInputDialog("Nhập số lượng", rs.getInt(6));
+                                                        if (quantityText.isBlank()) {
+                                                            JOptionPane.showMessageDialog(null,
+                                                                    "Số lượng không hợp lệ",
+                                                                    "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                        }
+                                                        for (char c : quantityText.toCharArray()) {
+                                                            if ((!Character.isDigit(c))) {
+                                                                JOptionPane.showMessageDialog(null,
+                                                                        "Số lượng không hợp lệ", "ERROR",
+                                                                        JOptionPane.ERROR_MESSAGE);
+                                                                break;
+                                                            }
+                                                        }
+                                                        int quantity = Integer.parseInt(quantityText);
+
+                                                        String imageAddress = JOptionPane
+                                                                .showInputDialog("Nhập địa chỉ hình ảnh",
+                                                                        rs.getString(9));
+                                                        if (!imageAddress.isBlank()) {
+                                                            String fundsText = JOptionPane
+                                                                    .showInputDialog("Nhập giá mua vào", rs.getInt(7));
+                                                            if (fundsText.isBlank()) {
+                                                                JOptionPane.showMessageDialog(null, "Giá không hợp lệ",
+                                                                        "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                            }
+                                                            for (char c : fundsText.toCharArray()) {
+                                                                if (!Character.isDigit(c)) {
+                                                                    JOptionPane.showMessageDialog(null,
+                                                                            "Giá không hợp lệ",
+                                                                            "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                                    break;
+                                                                }
+                                                            }
+                                                            Float funds = Float.parseFloat(fundsText);
+
+                                                            String costText = JOptionPane
+                                                                    .showInputDialog("Nhập giá bán ra", rs.getInt(8));
+                                                            if (costText.isBlank()) {
+                                                                JOptionPane.showMessageDialog(null, "Giá không hợp lệ",
+                                                                        "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                            }
+                                                            for (char c : costText.toCharArray()) {
+                                                                if (!Character.isDigit(c)) {
+                                                                    JOptionPane.showMessageDialog(null,
+                                                                            "Giá không hợp lệ", "ERROR",
+                                                                            JOptionPane.ERROR_MESSAGE);
+                                                                    break;
+                                                                }
+                                                            }
+                                                            Float cost = Float.parseFloat(costText);
+
+                                                            try {
+                                                                connection = conn.getConnection();
+                                                                sql = "update sach set `tensanpham` = ?,`nhaxuatban` = ?,`tacgia` = ?,`theloai` = ?,`soluong` = ?,`giamua` = ?,`giaban` = ?,`image` = ? where `masanpham` = ?";
+                                                                ps = connection.prepareStatement(sql);
+
+                                                                ps.setString(1, productName);
+                                                                ps.setString(2, producerName);
+                                                                ps.setString(3, directorName);
+                                                                ps.setString(4, category);
+                                                                ps.setInt(5, quantity);
+                                                                ps.setFloat(6, funds);
+                                                                ps.setFloat(7, cost);
+                                                                ps.setString(8, imageAddress);
+                                                                ps.setInt(9, id);
+                                                                ps.executeUpdate();
+                                                                ps.close();
+
+                                                            } catch (ArrayIndexOutOfBoundsException ex) {
+
+                                                            }
+                                                        } else {
+                                                            JOptionPane.showMessageDialog(null, "Ảnh trống", "ERROR",
+                                                                    JOptionPane.ERROR_MESSAGE);
+                                                        }
+                                                    } else {
+                                                        JOptionPane.showMessageDialog(null,
+                                                                "Chưa nhập loại sách", "ERROR",
+                                                                JOptionPane.ERROR_MESSAGE);
+                                                    }
+                                                } else {
+                                                    JOptionPane.showMessageDialog(null, "Chưa nhập tên tác giả",
+                                                            "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                }
+                                            } else {
+                                                JOptionPane.showMessageDialog(null, "Chưa nhập tên nhà xuất bản",
+                                                        "ERROR",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                            }
+                                        } else {
+                                            JOptionPane.showMessageDialog(null, "Chưa nhập tên sách", "ERROR",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                        }
+
+                                        if (productName == null || imageAddress == null)
+                                            throw new NullPointerException();
+                                    }
+
+                                    // if(productName == null){
+                                    // JOptionPane.showMessageDialog(null, "Tên không hợp lệ", "ERROR",
+                                    // JOptionPane.ERROR_MESSAGE);
+                                    // }
+                                    // System.out.println("1" + productName + "1");
+
                                 } catch (Exception ex) {
-                                    JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                            JOptionPane.ERROR_MESSAGE);
+
                                 }
                             }
 
@@ -995,48 +1205,152 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                             if (choice == JOptionPane.YES_OPTION) {
                                 try {
                                     Connection connection = conn.getConnection();
-                                    String sql = "Update dianhac set `tensanpham` = ?, `nhasanxuat` = ?, `nghesi` = ?, `thoiluong` = ?, `theloai` = ?, `soluong` = ?, `giamua` = ?, `giaban` = ?, `image` = ?  where `masanpham` = ?";
+                                    String sql = "select *from dianhac where `masanpham` = ?";
                                     PreparedStatement ps = connection.prepareStatement(sql);
 
-                                    String productName = JOptionPane.showInputDialog(null, "Nhập tên sản phẩm");
-                                    if (productName == null)
-                                        throw new NullPointerException();
-
-                                    String imageAddress = JOptionPane.showInputDialog(null,
-                                            "Nhập địa chỉ ảnh minh họa");
-                                    if (imageAddress == null)
-                                        throw new NullPointerException();
-
-                                    float cost = Float
-                                            .parseFloat((String) JOptionPane.showInputDialog(null, "Nhập giá"));
-                                    int quantity = Integer.parseInt((String) JOptionPane.showInputDialog(null,
-                                            "Nhập số lượng"));
-
                                     ps.setInt(1, id);
-                                    ps.executeUpdate();
-                                    ps.close();
-                                    if (productName == null || imageAddress == null)
-                                        throw new NullPointerException();
+                                    ResultSet rs = ps.executeQuery();
 
-                                    URL url = OnlineSelectionScrollPane.class.getClassLoader()
-                                            .getResource(imageAddress);
-                                    File file = new File(imageAddress);
-                                    imageNameLabel.setText(productName);
-                                    imageNameLabel.setIcon(new ImageIcon(ImageIO.read(url)));
+                                    while (rs.next()) {
 
-                                    costLabel.setText("" + cost);
-                                    quantityLabel.setText("" + quantity);
-                                } catch (NumberFormatException ex) {
-                                    JOptionPane.showMessageDialog(null, "Chi phí không hợp lệ", "ERROR",
-                                            JOptionPane.ERROR_MESSAGE);
-                                } catch (IOException ex) {
-                                    JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                            JOptionPane.ERROR_MESSAGE);
-                                } catch (NullPointerException ex) {
-                                    JOptionPane.showMessageDialog(null, "Operation Cancelled");
+                                        // dang do
+                                        String productName = JOptionPane.showInputDialog("Nhập tên sản phẩm",
+                                                rs.getString(2));
+                                        if (!productName.isBlank()) {
+                                            String producerName = JOptionPane.showInputDialog(
+                                                    "Nhập tên nhà sản xuất", rs.getString(3));
+                                            if (!producerName.isBlank()) {
+                                                String directorName = JOptionPane.showInputDialog("Nhập tên nghệ sĩ",
+                                                        rs.getString(4));
+                                                if (!directorName.isBlank()) {
+                                                    String lengthText = JOptionPane
+                                                            .showInputDialog("Nhập thời lượng đĩa nhạc", rs.getInt(5));
+                                                    if (lengthText.isBlank()) {
+                                                        JOptionPane.showMessageDialog(null, "Thời lượng không hợp lệ",
+                                                                "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                    }
+                                                    for (char c : lengthText.toCharArray()) { // ktra co phai la so hay
+                                                                                              // khong
+                                                        if (!Character.isDigit(c)) {
+                                                            JOptionPane.showMessageDialog(null,
+                                                                    "Thời lượng không hợp lệ",
+                                                                    "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                            break;
+                                                        }
+                                                    }
+                                                    int length = Integer.parseInt(lengthText);
+                                                    String category = JOptionPane.showInputDialog("Nhập thể loại nhạc",
+                                                            rs.getString(6));
+                                                    if (!category.isBlank()) {
+                                                        String quantityText = JOptionPane
+                                                                .showInputDialog("Nhập số lượng", rs.getInt(7));
+                                                        if (quantityText.isBlank()) {
+                                                            JOptionPane.showMessageDialog(null,
+                                                                    "Số lượng không hợp lệ",
+                                                                    "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                        }
+                                                        for (char c : quantityText.toCharArray()) {
+                                                            if ((!Character.isDigit(c))) {
+                                                                JOptionPane.showMessageDialog(null,
+                                                                        "Số lượng không hợp lệ", "ERROR",
+                                                                        JOptionPane.ERROR_MESSAGE);
+                                                                break;
+                                                            }
+                                                        }
+                                                        int quantity = Integer.parseInt(quantityText);
+
+                                                        String imageAddress = JOptionPane.showInputDialog(
+                                                                "Nhập địa chỉ hình ảnh", rs.getString(10));
+                                                        if (!imageAddress.isBlank()) {
+                                                            String fundsText = JOptionPane
+                                                                    .showInputDialog("Nhập giá mua vào", rs.getInt(8));
+                                                            if (fundsText.isBlank()) {
+                                                                JOptionPane.showMessageDialog(null, "Giá không hợp lệ",
+                                                                        "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                            }
+                                                            for (char c : fundsText.toCharArray()) {
+                                                                if (!Character.isDigit(c)) {
+                                                                    JOptionPane.showMessageDialog(null,
+                                                                            "Giá không hợp lệ",
+                                                                            "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                                    break;
+                                                                }
+                                                            }
+                                                            Float funds = Float.parseFloat(fundsText);
+
+                                                            String costText = JOptionPane
+                                                                    .showInputDialog("Nhập giá bán ra", rs.getInt(9));
+                                                            if (costText.isBlank()) {
+                                                                JOptionPane.showMessageDialog(null, "Giá không hợp lệ",
+                                                                        "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                            }
+                                                            for (char c : costText.toCharArray()) {
+                                                                if (!Character.isDigit(c)) {
+                                                                    JOptionPane.showMessageDialog(null,
+                                                                            "Giá không hợp lệ",
+                                                                            "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                                    break;
+                                                                }
+                                                            }
+                                                            Float cost = Float.parseFloat(costText);
+                                                            List<Track> trackList = new ArrayList<Track>();
+                                                            try {
+
+                                                                // System.out.println("check input: " + productName);
+                                                                connection = conn.getConnection();
+                                                                sql = "update dianhac set `tensanpham` = ?,`nhasanxuat` = ?,`nghesi` = ?,`thoiluong` = ?,`theloai` = ?, `soluong` = ?,`giamua` = ?,`giaban` = ?,`image` = ? where `masanpham` = ?";
+                                                                ps = connection.prepareStatement(sql);
+
+                                                                ps.setString(1, productName);
+                                                                ps.setString(2, producerName);
+                                                                ps.setString(3, directorName);
+                                                                ps.setInt(4, length);
+                                                                ps.setString(5, category);
+                                                                ps.setInt(6, quantity);
+                                                                ps.setFloat(7, funds);
+                                                                ps.setFloat(8, cost);
+                                                                ps.setString(9, imageAddress);
+                                                                ps.setInt(10, id);
+                                                                ps.executeUpdate();
+                                                                ps.close();
+
+                                                            } catch (ArrayIndexOutOfBoundsException ex) {
+
+                                                            }
+                                                        } else {
+                                                            JOptionPane.showMessageDialog(null, "Ảnh trống", "ERROR",
+                                                                    JOptionPane.ERROR_MESSAGE);
+                                                        }
+                                                    } else {
+                                                        JOptionPane.showMessageDialog(null,
+                                                                "Chưa nhập thể loại phim", "ERROR",
+                                                                JOptionPane.ERROR_MESSAGE);
+                                                    }
+                                                } else {
+                                                    JOptionPane.showMessageDialog(null, "Chưa nhập tên đạo diễn",
+                                                            "ERROR", JOptionPane.ERROR_MESSAGE);
+                                                }
+                                            } else {
+                                                JOptionPane.showMessageDialog(null, "Chưa nhập tên nhà sản xuất",
+                                                        "ERROR",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                            }
+                                        } else {
+                                            JOptionPane.showMessageDialog(null, "Chưa nhập tên phim", "ERROR",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                        }
+                                        if (productName == null || imageAddress == null)
+                                            throw new NullPointerException();
+                                    }
+
+                                    // if(productName == null){
+                                    // JOptionPane.showMessageDialog(null, "Tên không hợp lệ", "ERROR",
+                                    // JOptionPane.ERROR_MESSAGE);
+                                    // }
+                                    // System.out.println("1" + productName + "1");
+
                                 } catch (Exception ex) {
-                                    JOptionPane.showMessageDialog(null, "Không thấy ảnh", "ERROR",
-                                            JOptionPane.ERROR_MESSAGE);
+
                                 }
                             }
 
@@ -1045,8 +1359,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                     } else { // if not admin access
 
                         DetailCD detail = new DetailCD(id, title, imageAddress, director, length, cost, quantity,
-                                artist,
-                                trackList);
+                                artist, trackList);
                     }
                 }
 

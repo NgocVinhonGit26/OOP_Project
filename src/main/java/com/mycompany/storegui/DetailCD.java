@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -113,22 +115,50 @@ public class DetailCD {
                     int choice = JOptionPane.showConfirmDialog(null, "Thêm vào giỏ hàng?",
                             "Confirmation", JOptionPane.YES_NO_OPTION);
                     if (choice == JOptionPane.YES_OPTION) {
-                        stmt = connection.prepareStatement(sql);
-                        stmt.setInt(1, quantity - 1);
-                        stmt.setInt(2, id);
-                        stmt.executeUpdate();
+                        Statement stmtMax = connection.createStatement();
+                        ResultSet rs = stmtMax.executeQuery("select max(idHD) from hoadon");
+                        while (rs.next()) {
+                            System.out.println(rs.getInt(1));
+                            String qttBuy = JOptionPane.showInputDialog(null,
+                                    "Quý khách muốn mua bao nhiêu ?");
+                            int qtt = Integer.parseInt(qttBuy);
+                            if (qtt > quantity) {
+                                JOptionPane.showMessageDialog(null, "Rất tiếc ! Số lượng mua vượt quá giới hạn",
+                                        "ERROR", JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                String toHD = "insert into `chitiethd` (`idHD`,`masanpham`,`soluong`,`giatri`) values (?,?,?,?)";
+                                stmt = connection.prepareStatement(toHD);
 
-                        Item tempItem = new Item();
-                        tempItem.setQuantity(quantity - 1);
+                                stmt.setInt(1, rs.getInt(1));
+                                stmt.setInt(2, id);
+                                stmt.setInt(3, qtt);
+                                stmt.setFloat(4, qtt * cost);
+                                stmt.executeUpdate();
 
-                        OnlineSelectionScrollPane.CART.add(new Item(title, imageAddress, cost));
+                                stmt = connection.prepareStatement(sql);
+                                stmt.setInt(1, quantity - qtt);
+                                stmt.setInt(2, id);
+                                stmt.executeUpdate();
+                                stmt.close();
 
-                        MainPanel.setSubContainer(new OnlineSelectionScrollPane());
-                        System.out.println("datialcd");
+                                // Item tempItem = new Item();
+                                // tempItem.setQuantity(quantity - qtt);
+
+                                OnlineSelectionScrollPane.CART.add(new Cart(title, qtt, cost, qtt * cost, 0.7f));
+                                for (Cart cart : OnlineSelectionScrollPane.CART) {
+                                    System.out.println(cart.getNameProduct());
+                                }
+
+                                MainPanel.setSubContainer(new OnlineSelectionScrollPane());
+
+                                System.out.println("datialcd");
+                            }
+                        }
                     }
                 } catch (Exception ex) {
                     // TODO: handle exception
                 }
+                // MainPanel.setSubContainer(new ShowOnlineCartPanel());
             }
         });
         panel.add(btnBuy);

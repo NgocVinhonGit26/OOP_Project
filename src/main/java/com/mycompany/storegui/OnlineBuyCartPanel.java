@@ -33,12 +33,12 @@ public class OnlineBuyCartPanel extends JPanel {
             ResultSet rs = stmt.executeQuery("select * from user where userName = '" + loginedEmail + "'");
             while (rs.next()) {
                 double sum = 0;
-                for (Item item : OnlineSelectionScrollPane.CART)
-                    sum += item.getCost();
-
+                for (Cart cart : OnlineSelectionScrollPane.CART)
+                    sum += cart.getTotalCost();
+                sum = sum + sum * ShowOnlineCartPanel.chietkhau;
                 gbc.insets = new Insets(0, 0, 15, 5); // spacings
 
-                JLabel totalLabel = new JLabel("Total:  " + sum);
+                JLabel totalLabel = new JLabel("Total:  " + Math.ceil(sum * 100.0) / 100.0);
                 totalLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
                 addComponent(totalLabel, 1, 0, 2, 1);
 

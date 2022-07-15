@@ -27,7 +27,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
     private static final JPanel MAIN_PANEL = new JPanel(); // static because scroll pane "add" method not working and so
                                                            // to pass it to its constructor
     private static final HashMap<String, JPanel> CATEGORIES = new HashMap<>(); // keep record of categories
-    public static final ArrayList<Item> CART = new ArrayList<>(); // keep record of items included in cart
+    public static final ArrayList<Cart> CART = new ArrayList<>(); // keep record of items included in cart
     public static final ArrayList<DigitalVideoDisc> DVDList = new ArrayList<>();
     public static final ArrayList<Book> bookList = new ArrayList<>();
     public static final ArrayList<CompactDisc> CDList = new ArrayList<>();
@@ -618,7 +618,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
                 } else { // if not admin access
 
-                    DetailDVD detail = new DetailDVD(productName, imageAddress, cost, quantity, 1, "vinh", "vinh");
+                    DetailDVD detail = new DetailDVD(1, productName, imageAddress, cost, quantity, 1, "vinh", "vinh");
                     // test detail = new test(productName, imageAddress, cost, quantity);
                 }
             }
@@ -870,7 +870,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
                     } else { // if not admin access
 
-                        DetailDVD detail = new DetailDVD(title, imageAddress, cost, quantity, length, director,
+                        DetailDVD detail = new DetailDVD(id, title, imageAddress, cost, quantity, length, director,
                                 producer);
                         // test detail = new test(productName, imageAddress, cost, quantity);
                     }
@@ -1107,7 +1107,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
                     } else { // if not admin access
 
-                        DetailBook detail = new DetailBook(title, imageAddress, cost, quantity, authors, publisher,
+                        DetailBook detail = new DetailBook(id, title, imageAddress, cost, quantity, authors, publisher,
                                 category);
                         // test detail = new test(productName, imageAddress, cost, quantity);
                     }

@@ -5,185 +5,38 @@
  */
 package com.mycompany.storegui;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.lang.Thread.State;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-
+import java.awt.*;
+import java.awt.Color;
 import javax.swing.*;
 
 import com.mycompany.connectDB.connectDB;
 
-import java.util.Arrays;
-import java.awt.Label;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.CardLayout;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
+import java.awt.event.*;
+import java.rmi.server.ObjID;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class test extends JPanel {
-    private static boolean adminAccess = false;
-    private static connectDB conn;
-    private JTextField textField;
+    private JTable table;
+    connectDB conn;
 
     public test() {
-        super();
-        setBackground(Color.PINK);
-
-        Dimension size = new Dimension(1000, 35);
         setLayout(null);
-        
-        JPanel panel = new JPanel();
-        panel.setBounds(312, 223, 808, 400);
-        add(panel);
-                        panel.setLayout(null);
-                
-                        JPasswordField passwordField = new JPasswordField(20);
-                        JPanel passwordPanel = new JPanel();
-                        passwordPanel.setBounds(301, 218, 500, 35);
-                        panel.add(passwordPanel);
-                        passwordPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-                        JLabel label_3 = new JLabel("Mật khẩu:");
-                        passwordPanel.add(label_3);
-                        passwordPanel.add(passwordField);
-                        passwordPanel.setPreferredSize(new Dimension(500, 35));
-                        passwordPanel.setMaximumSize(new Dimension(500, 35));
-        
-                JButton btnforgotPassword = new JButton("Quên mật khẩu");
-                JButton btnLogin = new JButton("Đăng nhập");
-                JButton btnRegister = new JButton("Đăng ký");
-                JButton btnBack = new JButton("Back");
-                JPanel logPanel = new JPanel();
-                logPanel.setBounds(301, 263, 500, 35);
-                panel.add(logPanel);
-                
-                        logPanel.add(btnforgotPassword);
-                        logPanel.add(btnLogin);
-                        logPanel.add(btnRegister);
-                        logPanel.add(btnBack);
-                        logPanel.setPreferredSize(new Dimension(500, 35));
-                        logPanel.setMaximumSize(new Dimension(500, 35));
-                        
-                        JLabel label = new JLabel("");
-//                        label.setBackground(Color.PINK);
-                        try {
-                            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("avt_login1.png");
-                            label = new JLabel(new ImageIcon(url), JLabel.CENTER);
-                        } catch (Exception ex) {
-                            JOptionPane.showMessageDialog(null, "Image not found", "ERROR", JOptionPane.ERROR_MESSAGE);
-                            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
-                            label = new JLabel("", new ImageIcon(url), JLabel.CENTER);
-                        }
-                        label.setBounds(10, 90, 282, 241);
-                        panel.add(label);
-                        
-                        JLabel label_1 = new JLabel("");
-                        try {
-                            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("login_title.png");
-                            label_1 = new JLabel(new ImageIcon(url), JLabel.CENTER);
-                        } catch (Exception ex) {
-                            JOptionPane.showMessageDialog(null, "Image not found", "ERROR", JOptionPane.ERROR_MESSAGE);
-                            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
-                            label_1 = new JLabel("", new ImageIcon(url), JLabel.CENTER);
-                        }
-                        label_1.setBounds(301, 50, 490, 110);
-                        panel.add(label_1);
-                        
-                        JPanel emailPanel = new JPanel();
-                        emailPanel.setPreferredSize(new Dimension(500, 35));
-                        emailPanel.setMaximumSize(new Dimension(500, 35));
-                        emailPanel.setBounds(301, 170, 500, 35);
-                        panel.add(emailPanel);
-                        
-                        JLabel label_2 = new JLabel("Tài khoản: ");
-                        emailPanel.add(label_2);
-                        
-                        textField = new JTextField(20);
-                        emailPanel.add(textField);
-                        
-                       
 
-        btnforgotPassword.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String email = JOptionPane.showInputDialog(null, "Nhập địa chỉ email");
-                try {
-                    Connection connect = conn.getConnection();
-                    Statement stmt = connect.createStatement();
-                    ResultSet rs = stmt.executeQuery("select * from user");
-                    int check = 0;
-                    while (rs.next()) {
-                        if (rs.getString(2).equals(email)) {
-                            JOptionPane.showMessageDialog(null,
-                                    "Tin nhắn được gửi đến email và điện thoại di động của bạn",
-                                    "Information", JOptionPane.INFORMATION_MESSAGE);
-                            check = 1;
-                        }
-                    }
-                    if (check == 0)
-                        JOptionPane.showMessageDialog(null, "Incorrect Email", "ERROR", JOptionPane.ERROR_MESSAGE);
-                } catch (Exception ex) {
-                    // TODO: handle exception
-                }
-            }
-        });
+        JButton btnBack = new JButton("Back");
+        btnBack.setBounds(594, 10, 62, 21);
+        JButton btnBuyCart = new JButton("Mua sản phẩm trong giỏ hàng");
+        btnBuyCart.setBounds(681, 10, 189, 21);
 
-        btnLogin.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Connection connect = conn.getConnection();
-                    Statement stmt = connect.createStatement();
-                    ResultSet rs = stmt.executeQuery("select * from user");
-                    int check = 0;
-                    while (rs.next()) {
-                        // System.out.println(rs.getString(2));
-                        if (emailField.getText().equals(rs.getString(2))) {
-                            check = 1;
-                            if (rs.getString(3).equals(String.valueOf(passwordField.getPassword()))) {
-                                OnlineRegistrationPanel.setLogin(true);
-                                OnlineBuyCartPanel.setLoginedEmail(emailField.getText());
-                                if (rs.getBoolean(7)) {
-                                    JOptionPane.showMessageDialog(null, "Admin Access");
-                                    adminAccess = true;
-                                    MainPanel.setSubContainer(new OnlineSelectionScrollPane());
-                                    break;
-                                } else {
-                                    JOptionPane.showMessageDialog(null, "Đăng nhập thành công");
-                                    MainPanel.setSubContainer(new OnlineBuyCartPanel());
-                                    break;
-                                }
-                            } else {
-                                JOptionPane.showMessageDialog(null, "Sai mật khẩu", "ERROR",
-                                        JOptionPane.ERROR_MESSAGE);
-                                break;
-                            }
-                        }
-                    }
-                    if (check == 0) {
-                        JOptionPane.showMessageDialog(null, "Nhập sai Email", "ERROR",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                } catch (Exception ex) {
+        JPanel btnsPanel = new JPanel();
+        btnsPanel.setBounds(0, 0, 1920, 41);
+        btnsPanel.setLayout(null);
+        btnsPanel.add(btnBack);
+        btnsPanel.add(btnBuyCart);
 
-                }
-
-            }
-        });
-
-        btnRegister.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                MainPanel.setSubContainer(new OnlineRegistrationPanel());
-            }
-        });
+        add(btnsPanel);
 
         btnBack.addActionListener(new ActionListener() {
             @Override
@@ -192,17 +45,147 @@ public class test extends JPanel {
             }
         });
 
-    }
+        btnBuyCart.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (OnlineRegistrationPanel.isLogin())
+                    MainPanel.setSubContainer(new OnlineBuyCartPanel());
+                else
+                    MainPanel.setSubContainer(new OnlineLoginPanel());
+            }
+        });
 
-    public static boolean isAdminAccess() {
-        return adminAccess;
-    }
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setBounds(241, 56, 1096, 631);
+        add(scrollPane);
 
-    public static void setAdminAccess(boolean access) {
         try {
-            adminAccess = access;
-        } catch (IllegalArgumentException ex) {
-            adminAccess = false;
+            Connection connect = conn.getConnection();
+            Statement stmt = connect.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from chitiethd");
+            ResultSet search;
+            Object columnNames[] = { "Tên sản phẩm", "Số lượng", "Đơn giá", "Giá trị" };
+            Object rowData[][] = new Object[50][4];
+
+            int i = 0;
+            while (rs.next()) {
+                if (rs.getInt(2) > 0 && rs.getInt(2) < 31) {
+                    String sql = "select `tensanpham`, `giaban` from diaphim where `masanpham` = ?";
+                    PreparedStatement s = connect.prepareStatement(sql);
+                    s.setInt(1, rs.getInt(2));
+                    search = s.executeQuery();
+
+                    while (search.next()) {
+
+                        Object tmp[][] = { { search.getString(1), rs.getInt(3), search.getFloat(2),
+                                rs.getInt(3) * search.getFloat(2) } };
+                        System.arraycopy(tmp, 0, rowData, i, tmp.length);
+                        i = i + 1;
+                    }
+                } else {
+                    if (rs.getInt(2) > 30 && rs.getInt(2) < 61) {
+                        String sql = "select `tensanpham`, `giaban` from sach where `masanpham` = ?";
+                        PreparedStatement s = connect.prepareStatement(sql);
+                        s.setInt(1, rs.getInt(2));
+                        search = s.executeQuery();
+
+                        while (search.next()) {
+
+                            Object tmp[][] = { { search.getString(1), rs.getInt(3), search.getFloat(2),
+                                    rs.getInt(3) * search.getFloat(2) } };
+                            System.arraycopy(tmp, 0, rowData, i, tmp.length);
+                            i = i + 1;
+                        }
+                    } else {
+                        if (rs.getInt(2) > 60) {
+                            String sql = "select `tensanpham`, `giaban` from dianhac where `masanpham` = ?";
+                            PreparedStatement s = connect.prepareStatement(sql);
+                            s.setInt(1, rs.getInt(2));
+                            search = s.executeQuery();
+
+                            while (search.next()) {
+
+                                Object tmp[][] = { { search.getString(1), rs.getInt(3), search.getFloat(2),
+                                        rs.getInt(3) * search.getFloat(2) } };
+                                System.arraycopy(tmp, 0, rowData, i, tmp.length);
+                                i = i + 1;
+                            }
+                        }
+                    }
+                }
+                table = new JTable(rowData, columnNames);
+                scrollPane.setViewportView(table);
+            }
+
+        } catch (Exception ex) {
+            // TODO: handle exception
+        }
+
+        // showCart();
+
+        JLabel lblNewLabel = new JLabel("Ngày tháng năm: ");
+        lblNewLabel.setBounds(213, 697, 193, 68);
+        add(lblNewLabel);
+
+        JLabel lblChitKhu = new JLabel("Chiết khấu: \r\n");
+        lblChitKhu.setBounds(1195, 744, 193, 21);
+        add(lblChitKhu);
+
+        JLabel lblTngTin = new JLabel("Tổng tiền:");
+        lblTngTin.setBounds(1195, 776, 193, 13);
+        add(lblTngTin);
+        
+        JLabel lblTngGiTr = new JLabel("Tổng giá trị: ");
+        lblTngGiTr.setBounds(1195, 709, 193, 21);
+        add(lblTngGiTr);
+
+    }
+
+    private void showCart() {
+
+        for (Item item : OnlineSelectionScrollPane.CART) {
+            JPanel subPanel = new JPanel();
+            subPanel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray,
+                    Color.black));
+            JLabel label = new JLabel(item.getName() + " (Giá: " + item.getCost() + ")",
+                    new ImageIcon(item.getImageAddress()), JLabel.CENTER);
+
+            subPanel.add(label);
+            subPanel.setMaximumSize(new Dimension(1000, 75));
+            cartPanel.add(subPanel);
+            subPanel.setToolTipText("Nhấn vào đây để loại bỏ khỏi giỏ hàng");
+
+            subPanel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    int choice = JOptionPane.showConfirmDialog(null, "Lấy ra khỏi giỏ hàng?",
+                            "Confirmation",
+                            JOptionPane.YES_NO_OPTION);
+                    if (choice == JOptionPane.YES_OPTION) {
+                        OnlineSelectionScrollPane.CART.remove(item);
+                        // cartPanel.remove(subPanel);
+                        // cartPanel.validate();
+                        // cartPanel.repaint();
+                    }
+
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    subPanel.setBackground(Color.lightGray);
+                    subPanel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray,
+                            Color.red));
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    subPanel.setBackground(null);
+                    subPanel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray,
+                            Color.black));
+                }
+
+            });
         }
     }
 }

@@ -16,6 +16,7 @@ insert into `user` (`userName`,`passWord`,`tenkhachhang`,`sodienthoai`,`diachi`,
 					('vinh.pn@mail.com','admin','phung ngoc vinh', '0867630856', 'quoc oai - ha noi', 1),
 					('dieu.nth@mail.com','admin','ngo thi huyen dieu', '0375384273', 'tien du - bac ninh', 1),
                     ('1','1','phung ngoc vinh', '0867630856', 'quoc oai - ha noi', 1),
+                    ('2','2','phung ngoc vinh', '0867630856', 'quoc oai - ha noi', 0),
                     ('admin@mail.com','admin','admin', '0867630878', 'quoc oai - ha noi', 0);
 create table `sach` (
 	`masanpham` int auto_increment,
@@ -31,10 +32,10 @@ create table `sach` (
 );
 
 insert into `sach` (`masanpham`,`tensanpham`,`nhaxuatban`,`tacgia`,`theloai`,`soluong`,`giamua`,`giaban`,`image`) values
-					(5,"It","Viking Press", "Stephen King","horror",100,25000,30000,"it.png"),
-					(6,"The Shining","Doubleday", "Stephen King","horror",150,25000,30000,"shining.jpg"),
-                    (7,"Dragon","TSR", "Lovecraft","horror",100,25000,30000,"dragon.jpg"),
-                    (8,"De men phieu luu ky","Nha xuat Kim Dong", "To Hoai","Truyen tranh",100,25000,30000,"demen.jpg");
+					(31,"It","Viking Press", "Stephen King","horror",100,25000,30000,"it.png"),
+					(32,"The Shining","Doubleday", "Stephen King","horror",150,25000,30000,"shining.jpg"),
+                    (33,"Dragon","TSR", "Lovecraft","horror",100,25000,30000,"dragon.jpg"),
+                    (34,"De men phieu luu ky","Nha xuat Kim Dong", "To Hoai","Truyen tranh",100,25000,30000,"demen.jpg");
 
 create table `dianhac` (
 	`masanpham` int auto_increment,
@@ -51,8 +52,8 @@ create table `dianhac` (
 );
 
 insert into `dianhac` (`masanpham`,`tensanpham`,`nhasanxuat`,`nghesi`,`thoiluong`,`theloai`,`soluong`,`giamua`,`giaban`,`image`) values
-						(9,"Mint Jams","Alfa Records","Casiopea",150,"jazz fusion",50,15000.4,20000,"mint.jpg"),
-						(10,"The Beatles","George Martin","The Beatles",120,"pop & rock",50,15000,20000,"beatles.png");
+						(61,"Mint Jams","Alfa Records","Casiopea",150,"jazz fusion",50,15000.4,20000,"mint.jpg"),
+						(62,"The Beatles","George Martin","The Beatles",120,"pop & rock",50,15000,20000,"beatles.png");
 
 create table `diaphim` (
 	`masanpham` int auto_increment,
@@ -75,21 +76,35 @@ insert into `diaphim` (`masanpham`,`tensanpham`,`nhasanxuat`,`daodien`,`thoiluon
                         (4,"The Incredibles","Pixar","Brad Bird",115,"animation",50,20000,25000,"increibles.png");
 
 create table `hoadon` (
-	`idHD` varchar(10) not null,
-    `idKH` int,
-    `maspSach` int,
-    `maspNhac` int,
-    `maspPhim` int,
-    `ngaytaodon` datetime not null,
-    `dongia` double not null,
+	`idHD` int auto_increment,
+    `id` int,
+    `ngaytaodon` date not null,
     `chietkhau` double not null,
     `thanhtien` double not null,
-    foreign key (idKH) references `user`(id),
-    foreign key (maspSach) references `sach`(masanpham),
-    foreign key (maspNhac) references `dianhac`(masanpham),
-    foreign key (maspPhim) references `diaphim`(masanpham),
+    foreign key (id) references `user`(id),
     constraint PK_HD primary key (idHD)
 );
+
+insert into `hoadon` (`id`,`ngaytaodon`,`chietkhau`,`thanhtien`) values 
+	(1,now(),0.7,45),
+    (2,now(),0.7,45);
+
+
+create table `chitiethd`(
+	`idHD` int not null,
+	`masanpham` int,
+    `soluong` int not null,
+    `giatri` double not null,
+    foreign key (idHD) references `hoadon`(idHD)
+);
+
+insert into `chitietHD` (`idHD`,`masanpham`,`soluong`,`giatri`) values
+	(1,1,5,12),
+    (1,2,10,12),
+    (1,31,10,12),
+    (2,31,10,12);
+
+
 
 create table `chiphikhac`(
 	`idCPK` int auto_increment not null,

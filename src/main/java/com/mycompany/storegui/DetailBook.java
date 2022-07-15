@@ -1,15 +1,24 @@
 package com.mycompany.storegui;
 
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import javax.swing.*;
+
+import com.mycompany.connectDB.connectDB;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.imageio.ImageIO;
 import java.util.List;
 
 public class DetailBook {
-    public DetailBook(String title, String imageAddress, Float cost, int quantity, List<String> authors,
+    connectDB conn;
+
+    public DetailBook(int id, String title, String imageAddress, Float cost, int quantity, List<String> authors,
             String publisher, String category) {
 
         JFrame detailFrame = new JFrame(title);
@@ -85,12 +94,55 @@ public class DetailBook {
         btnBuy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int choice = JOptionPane.showConfirmDialog(null, "Thêm vào giỏ hàng?",
-                        "Confirmation", JOptionPane.YES_NO_OPTION);
-                if (choice == JOptionPane.YES_OPTION) {
-                    Item tempItem = new Item();
-                    tempItem.setQuantity(quantity - 1);
-                    OnlineSelectionScrollPane.CART.add(new Item(title, imageAddress, cost));
+                try {
+                    Connection connection = conn.getConnection();
+                    String sql = "UPDATE sach set soluong=? WHERE masanpham=?";
+                    PreparedStatement stmt = null;
+                    int choice = JOptionPane.showConfirmDialog(null, "Thêm vào giỏ hàng?",
+                            "Confirmation", JOptionPane.YES_NO_OPTION);
+                    if (choice == JOptionPane.YES_OPTION) {
+                        Statement stmtMax = connection.createStatement();
+                        ResultSet rs = stmtMax.executeQuery("select max(idHD) from hoadon");
+                        while (rs.next()) {
+                            System.out.println(rs.getInt(1));
+                            String qttBuy = JOptionPane.showInputDialog(null,
+                                    "Quý khách muốn mua bao nhiêu ?");
+                            int qtt = Integer.parseInt(qttBuy);
+                            if (qtt > quantity) {
+                                JOptionPane.showMessageDialog(null, "Rất tiếc ! Số lượng mua vượt quá giới hạn",
+                                        "ERROR", JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                String toHD = "insert into `chitiethd` (`idHD`,`masanpham`,`soluong`,`giatri`) values (?,?,?,?)";
+                                stmt = connection.prepareStatement(toHD);
+
+                                stmt.setInt(1, rs.getInt(1));
+                                stmt.setInt(2, id);
+                                stmt.setInt(3, qtt);
+                                stmt.setFloat(4, qtt * cost);
+                                stmt.executeUpdate();
+
+                                stmt = connection.prepareStatement(sql);
+                                stmt.setInt(1, quantity - qtt);
+                                stmt.setInt(2, id);
+                                stmt.executeUpdate();
+                                stmt.close();
+
+                                // Item tempItem = new Item();
+                                // tempItem.setQuantity(quantity - qtt);
+
+                                OnlineSelectionScrollPane.CART.add(new Cart(title, qtt, cost, qtt * cost, 0.7f));
+                                for (Cart cart : OnlineSelectionScrollPane.CART) {
+                                    System.out.println(cart.getNameProduct());
+                                }
+
+                                MainPanel.setSubContainer(new OnlineSelectionScrollPane());
+
+                                System.out.println("datialcd");
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    // TODO: handle exception
                 }
             }
         });

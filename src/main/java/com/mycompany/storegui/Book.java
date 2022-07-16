@@ -30,9 +30,9 @@ public class Book extends Media {
             return;
     }
 
-    public Book(int id, String title, String category, float cost, String authors, int quantity, String image,
-            String publisher) {
-        super(id, title, category, cost, quantity, image);
+    public Book(int id, String title, String category, float funs, float cost, String authors, int quantity,
+            String image, String publisher) {
+        super(id, title, category, funs, cost, quantity, image);
         addAuthor(authors);
         this.publisher = publisher;
     }

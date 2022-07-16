@@ -23,9 +23,10 @@ public class CompactDisc extends Disc {
 		this.trackList = trackList;
 	}
 
-	public CompactDisc(int id, String title, String category, String director, int length, float cost, int quantity,
+	public CompactDisc(int id, String title, String category, String director, int length, float funds, float cost,
+			int quantity,
 			String image, String artist) {
-		super(id, title, category, director, length, cost, quantity, image);
+		super(id, title, category, director, length, funds, cost, quantity, image);
 		this.artist = artist;
 	}
 

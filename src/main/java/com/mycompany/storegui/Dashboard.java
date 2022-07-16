@@ -25,7 +25,7 @@ import java.time.LocalDate;
 import com.toedter.calendar.JMonthChooser;
 import com.toedter.calendar.JDateChooser;
 
-public class test extends JPanel {
+public class Dashboard extends JPanel {
     private JTable table;
     connectDB conn;
     LocalDate now = LocalDate.now();
@@ -35,7 +35,7 @@ public class test extends JPanel {
     public static float chietkhau;
     public static Statistical statistical = new Statistical();
 
-    public test() {
+    public Dashboard() {
         setLayout(null);
 
         JButton btnBack = new JButton("Back");
@@ -176,11 +176,6 @@ public class test extends JPanel {
         panel_5_2.setLayout(null);
 
         JPanel panel_6 = new JPanel();
-        panel_6.addMouseListener(new MouseAdapter() {
-        	@Override
-        	public void mouseClicked(MouseEvent e) {
-        	}
-        });
         panel_6.setBounds(10, 10, 379, 92);
         panel_5_2.add(panel_6);
         panel_6.setLayout(null);
@@ -213,11 +208,6 @@ public class test extends JPanel {
         panel_5_2.add(panel_8);
 
         JPanel panel_6_2 = new JPanel();
-        panel_6_2.addMouseListener(new MouseAdapter() {
-        	@Override
-        	public void mouseClicked(MouseEvent e) {
-        	}
-        });
         panel_6_2.setLayout(null);
         panel_6_2.setBounds(10, 125, 379, 82);
         panel_5_2.add(panel_6_2);

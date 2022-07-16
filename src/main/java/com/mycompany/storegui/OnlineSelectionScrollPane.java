@@ -53,8 +53,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
             while (rs.next()) {
                 DigitalVideoDisc dvd = new DigitalVideoDisc(rs.getInt(1), rs.getString(2),
-                        rs.getString(6),
-                        rs.getInt(5), rs.getString(4), rs.getFloat(9), rs.getInt(7),
+                        rs.getString(6), rs.getInt(5), rs.getString(4), rs.getFloat(8), rs.getFloat(9), rs.getInt(7),
                         rs.getString(10), rs.getString(3));
                 Collections.addAll(DVDList, dvd);
             }
@@ -68,9 +67,8 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
             ResultSet rs = stmt.executeQuery("select * from sach");
 
             while (rs.next()) {
-                Book book = new Book(rs.getInt(1), rs.getString(2), rs.getString(5),
-                        rs.getFloat(8),
-                        rs.getString(4), rs.getInt(6), rs.getString(9), rs.getString(3));
+                Book book = new Book(rs.getInt(1), rs.getString(2), rs.getString(5), rs.getFloat(7),
+                        rs.getFloat(8), rs.getString(4), rs.getInt(6), rs.getString(9), rs.getString(3));
                 Collections.addAll(bookList, book);
             }
         } catch (Exception e) {
@@ -85,9 +83,8 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
             while (rs.next()) {
 
                 CompactDisc cd = new CompactDisc(rs.getInt(1), rs.getString(2),
-                        rs.getString(6), rs.getString(4),
-                        rs.getInt(5), rs.getFloat(9), rs.getInt(7), rs.getString(10),
-                        rs.getString(3));
+                        rs.getString(6), rs.getString(4), rs.getInt(5), rs.getFloat(8), rs.getFloat(9), rs.getInt(7),
+                        rs.getString(10), rs.getString(3));
                 Collections.addAll(CDList, cd);
             }
         } catch (Exception e) {
@@ -98,8 +95,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         JPanel panel = new JPanel();
         for (DigitalVideoDisc dvd : DVDList) {
             panel.add(addProductDVD(dvd.id, dvd.title, dvd.image, dvd.cost, dvd.quantity,
-                    dvd.length, dvd.director,
-                    dvd.getProducer()));
+                    dvd.length, dvd.director, dvd.getProducer()));
         }
         CATEGORIES.get("DVD").add(panel);
 
@@ -107,8 +103,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         panel = new JPanel();
         for (Book book : bookList) {
             panel.add(addProductBook(book.id, book.title, book.image, book.cost,
-                    book.quantity, book.getAuthors(),
-                    book.getPublisher(), book.category));
+                    book.quantity, book.getAuthors(), book.getPublisher(), book.category));
         }
         CATEGORIES.get("Book").add(panel);
 
@@ -116,8 +111,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         panel = new JPanel();
         for (CompactDisc cd : CDList) {
             panel.add(addProductCD(cd.id, cd.title, cd.image, cd.getArtist(), cd.length,
-                    cd.cost, cd.quantity,
-                    cd.getDirector(), cd.getTrackList()));
+                    cd.cost, cd.quantity, cd.getDirector(), cd.getTrackList()));
         }
         CATEGORIES.get("CD").add(panel);
 
@@ -146,7 +140,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         subPanel.add(btnBuyCart);
 
         if (OnlineLoginPanel.isAdminAccess()) { // if have admin access give these extra things
-            JButton btnAddCategory = new JButton("Thêm danh mục mới");
+            JButton btnAddCategory = new JButton("Xem thống kê");
             subPanel.add(Box.createRigidArea(new Dimension(30, 0)));
             subPanel.add(btnAddCategory);
 
@@ -154,12 +148,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    String name = JOptionPane.showInputDialog(null, "Nhập tên Danh mục");
-                    String imageAddress = JOptionPane.showInputDialog(null, "Nhập địa chỉ hình ảnh");
-                    addCategory(name, imageAddress);
-                    MAIN_PANEL.add(CATEGORIES.get(name));
-                    MAIN_PANEL.validate();
-                    MAIN_PANEL.repaint();
+                    MainPanel.setSubContainer(new Dashboard());
                 }
 
             });

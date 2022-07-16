@@ -8,29 +8,20 @@ package com.mycompany.storegui;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.Thread.State;
+
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import javax.swing.*;
 
 import com.mycompany.connectDB.connectDB;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.awt.Label;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.CardLayout;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
 
 public class OnlineLoginPanel extends JPanel {
     private static boolean adminAccess = false;
@@ -155,7 +146,74 @@ public class OnlineLoginPanel extends JPanel {
                                 OnlineBuyCartPanel.setLoginedEmail(emailField.getText());
                                 if (rs.getBoolean(7)) {
                                     idUser = rs.getInt(1);
-                                    System.out.println("check chen hoadon3");
+                                    try {
+                                        // Statement stmtCount = connect.createStatement();
+                                        String sql = "select COUNT(`idHD`) from hoadon where `thanhtien` > 0";
+                                        ResultSet rsCount = stmt.executeQuery(sql);
+                                        while (rsCount.next()) {
+                                            Dashboard.statistical.setTotalOrder(rsCount.getInt(1));
+                                        }
+
+                                        // Statement stmtSum = connect.createStatement();
+                                        sql = "select SUM(`thanhtien`) from hoadon where `thanhtien` > 0";
+                                        ResultSet rsSum = stmt.executeQuery(sql);
+                                        while (rsSum.next()) {
+                                            Dashboard.statistical.setTotalCost(rsSum.getFloat(1));
+                                        }
+
+                                        sql = "select COUNT(DISTINCT(`masanpham`)) from chitiethd ";
+                                        ResultSet rsCountPro = stmt.executeQuery(sql);
+                                        while (rsCountPro.next()) {
+                                            Dashboard.statistical.setTotalProduct(rsCountPro.getInt(1));
+                                        }
+                                        Float fakeProfit = 0f;
+                                        int i = 0;
+                                        sql = "select `masanpham`, `soluong` from chitiethd";
+                                        ResultSet rsPro = stmt.executeQuery(sql);
+                                        while (rsPro.next()) {
+
+                                            if (rsPro.getInt(1) > 0 && rsPro.getInt(1) < 31) {
+                                                System.out.println("rsPro:" + rsPro.getInt(1));
+                                                for (DigitalVideoDisc dvd : OnlineSelectionScrollPane.DVDList) {
+                                                    if (rsPro.getInt(1) == dvd.getId()) {
+                                                        fakeProfit += rsPro.getInt(2) * dvd.getFuns();
+                                                        System.out.println(rsPro.getInt(2));
+                                                        i++;
+                                                    }
+                                                }
+                                            } else {
+                                                if (rsPro.getInt(1) > 30 && rsPro.getInt(1) < 61) {
+
+                                                    for (Book book : OnlineSelectionScrollPane.bookList) {
+                                                        if (rsPro.getInt(1) == book.getId()) {
+                                                            fakeProfit += rsPro.getInt(2) * book.getFuns();
+                                                            System.out.println(rsPro.getInt(2));
+                                                            i++;
+                                                        }
+                                                    }
+                                                } else {
+                                                    if (rsPro.getInt(1) > 60) {
+
+                                                        for (CompactDisc cd : OnlineSelectionScrollPane.CDList) {
+                                                            if (rsPro.getInt(1) == cd.getId()) {
+                                                                fakeProfit += rsPro.getInt(2) * cd.getFuns();
+                                                                System.out.println(rsPro.getInt(2));
+                                                                i++;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        System.out.println("fakeProfit " + i);
+
+                                        Dashboard.statistical
+                                                .setTotalProfit(Dashboard.statistical.getTotalCost() - fakeProfit);
+
+                                    } catch (Exception ex) {
+                                        // TODO: handle exception
+                                    }
+
                                     JOptionPane.showMessageDialog(null, "Admin Access");
                                     adminAccess = true;
                                     MainPanel.setSubContainer(new OnlineSelectionScrollPane());
@@ -170,7 +228,7 @@ public class OnlineLoginPanel extends JPanel {
                                         PreparedStatement ps = connection.prepareStatement(sql);
                                         ps.setInt(1, idUser);
                                         ps.setString(2, now.toString());
-                                        ps.setDouble(3, 0.7);
+                                        ps.setDouble(3, 0.15);
                                         ps.setDouble(4, 0);
                                         ps.executeUpdate();
                                         ps.close();

@@ -82,6 +82,7 @@ public class ShowOnlineCartPanel extends JPanel {
 
             totalValue += cart.getTotalCost();
             chietkhau = cart.getChietkhau();
+            System.out.println("chiet khau: " + chietkhau);
             table = new JTable(rowData, columnNames);
             scrollPane.setViewportView(table);
             i++;
@@ -166,12 +167,12 @@ public class ShowOnlineCartPanel extends JPanel {
         // // TODO: handle exception
         // }
 
-        totalCost = totalValue + totalValue * 0.7f;
+        totalCost = totalValue - totalValue * chietkhau;
         JLabel lblNewLabel = new JLabel("Ngày tháng năm:" + " " + now);
         lblNewLabel.setBounds(213, 697, 193, 68);
         add(lblNewLabel);
 
-        JLabel lblChitKhu = new JLabel("Chiết khấu: " + " " + chietkhau + "\r\n");
+        JLabel lblChitKhu = new JLabel("Chiết khấu: " + " " + chietkhau);
         lblChitKhu.setBounds(1195, 744, 193, 21);
         add(lblChitKhu);
 

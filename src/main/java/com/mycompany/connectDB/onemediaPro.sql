@@ -86,8 +86,8 @@ create table `hoadon` (
 );
 
 insert into `hoadon` (`id`,`ngaytaodon`,`chietkhau`,`thanhtien`) values 
-	(1,now(),0.7,45),
-    (2,now(),0.7,45);
+	(1,now(),0.15,675000),
+    (2,now(),0.15,300000);
 
 
 create table `chitiethd`(
@@ -99,12 +99,10 @@ create table `chitiethd`(
 );
 
 insert into `chitietHD` (`idHD`,`masanpham`,`soluong`,`giatri`) values
-	(1,1,5,12),
-    (1,2,10,12),
-    (1,31,10,12),
-    (2,31,10,12);
-
-
+	(1,1,5,125000),
+    (1,2,10,250000),
+    (1,31,10,300000),
+    (2,31,10,300000);
 
 create table `chiphikhac`(
 	`idCPK` int auto_increment not null,

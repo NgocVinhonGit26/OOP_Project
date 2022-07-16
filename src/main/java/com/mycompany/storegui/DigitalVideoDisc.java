@@ -11,9 +11,9 @@ public class DigitalVideoDisc extends Disc {
 		this.producer = producer;
 	}
 
-	public DigitalVideoDisc(int id, String title, String category, int length, String director, float cost,
+	public DigitalVideoDisc(int id, String title, String category, int length, String director, float funs, float cost,
 			int quantity, String image, String producer) {
-		super(id, title, category, director, length, cost, quantity, image);
+		super(id, title, category, director, length, funs, cost, quantity, image);
 		this.producer = producer;
 	}
 }

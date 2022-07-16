@@ -144,7 +144,7 @@ public class DetailCD {
                                 // Item tempItem = new Item();
                                 // tempItem.setQuantity(quantity - qtt);
 
-                                OnlineSelectionScrollPane.CART.add(new Cart(title, qtt, cost, qtt * cost, 0.7f));
+                                OnlineSelectionScrollPane.CART.add(new Cart(title, qtt, cost, qtt * cost, 0.15f));
                                 for (Cart cart : OnlineSelectionScrollPane.CART) {
                                     System.out.println(cart.getNameProduct());
                                 }

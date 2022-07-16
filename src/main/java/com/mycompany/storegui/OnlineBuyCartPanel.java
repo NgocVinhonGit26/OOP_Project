@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -20,6 +21,7 @@ public class OnlineBuyCartPanel extends JPanel {
     private final GridBagConstraints gbc = new GridBagConstraints();
     private static String loginedEmail = "";
     private static connectDB conn;
+    Double sum = 0.0;
 
     public OnlineBuyCartPanel() {
 
@@ -32,10 +34,10 @@ public class OnlineBuyCartPanel extends JPanel {
             System.out.println("khong gion1");
             ResultSet rs = stmt.executeQuery("select * from user where userName = '" + loginedEmail + "'");
             while (rs.next()) {
-                double sum = 0;
+
                 for (Cart cart : OnlineSelectionScrollPane.CART)
                     sum += cart.getTotalCost();
-                sum = sum + sum * ShowOnlineCartPanel.chietkhau;
+                sum = sum - sum * ShowOnlineCartPanel.chietkhau;
                 gbc.insets = new Insets(0, 0, 15, 5); // spacings
 
                 JLabel totalLabel = new JLabel("Total:  " + Math.ceil(sum * 100.0) / 100.0);
@@ -110,6 +112,23 @@ public class OnlineBuyCartPanel extends JPanel {
 
                             JOptionPane.showMessageDialog(null, "Cảm ơn quý khách!! Đặt hàng thành công\n"
                                     + "Đơn đặt hàng sẽ được giao trong vòng 15 ngày");
+
+                            try {
+                                Statement stmtMax = connect.createStatement();
+                                ResultSet rsMax = stmtMax.executeQuery("select max(idHD) from hoadon");
+                                while (rsMax.next()) {
+                                    String sqlMax = "update hoadon set `thanhtien` = ? where `idHD` = ?";
+                                    PreparedStatement psMax = connect.prepareStatement(sqlMax);
+                                    psMax.setDouble(1, Math.ceil(sum * 100.0) / 100.0);
+                                    psMax.setInt(2, rsMax.getInt(1));
+                                    psMax.executeUpdate();
+                                    psMax.close();
+                                }
+
+                            } catch (Exception ex) {
+                                // TODO: handle exception
+                            }
+
                             OnlineSelectionScrollPane.CART.clear();
                             MainPanel.setSubContainer(new OnlineSelectionScrollPane());
                         } catch (NumberFormatException ex) {

@@ -3,7 +3,7 @@ package com.mycompany.storegui;
 import java.util.StringTokenizer;
 
 public class Mydate {
-	private int day;
+    private int day;
     private int month;
     private int year;
 

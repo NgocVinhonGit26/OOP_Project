@@ -15,6 +15,7 @@ import org.w3c.dom.events.MouseEvent;
 import com.mycompany.connectDB.connectDB;
 
 import java.awt.event.*;
+import java.io.DataOutput;
 import java.net.URL;
 import java.rmi.server.ObjID;
 import java.sql.Connection;
@@ -27,7 +28,7 @@ import com.toedter.calendar.JDateChooser;
 
 public class Dashboard extends JPanel {
     private JTable table;
-    connectDB conn;
+    private static connectDB conn;
     LocalDate now = LocalDate.now();
     private String date;
     private float totalValue = 0;
@@ -270,10 +271,6 @@ public class Dashboard extends JPanel {
         panel_5_1.add(lblNewLabel_4);
 
         JDateChooser dateChooser = new JDateChooser();
-        dateChooser.getCalendarButton().addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            }
-        });
         dateChooser.setBounds(168, 182, 132, 19);
         add(dateChooser);
 
@@ -292,6 +289,96 @@ public class Dashboard extends JPanel {
         add(dateChooser_1);
 
         JButton btnNewButton = new JButton("Thống kê");
+        btnNewButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (dateChooser.getDate() != null && dateChooser_1.getDate() != null) {
+                    java.sql.Date dateFrom = new java.sql.Date(dateChooser.getDate().getTime());
+                    java.sql.Date dateTo = new java.sql.Date(dateChooser_1.getDate().getTime());
+                    java.sql.Date dateNow = new java.sql.Date(System.currentTimeMillis());
+                    if (dateFrom.before(dateTo) && dateTo.before(dateNow) && dateFrom.before(dateNow)) {
+                        System.out.println("he lo");
+                        try {
+                            Connection connect = conn.getConnection();
+                            Statement stmt = connect.createStatement();
+                            String sql = "select COUNT(`idHD`) from hoadon where `thanhtien` > 0";
+                            ResultSet rsCount = stmt.executeQuery(sql);
+                            while (rsCount.next()) {
+                                Dashboard.statistical.setTotalOrder(rsCount.getInt(1));
+                            }
+                            // lblNewLabel_2_4.setText(String.valueOf(statistical.getTotalOrder()));
+                            lblNewLabel_2_4.setText("0");
+
+                            // Statement stmtSum = connect.createStatement();
+                            sql = "select SUM(`thanhtien`) from hoadon where `thanhtien` > 0";
+                            ResultSet rsSum = stmt.executeQuery(sql);
+                            while (rsSum.next()) {
+                                Dashboard.statistical.setTotalCost(rsSum.getFloat(1));
+                            }
+                            // lblNewLabel_2_4_2.setText(String.valueOf(statistical.getTotalCost()));
+                            lblNewLabel_2_4_2.setText("0");
+
+                            sql = "select COUNT(DISTINCT(`masanpham`)) from chitiethd ";
+                            ResultSet rsCountPro = stmt.executeQuery(sql);
+                            while (rsCountPro.next()) {
+                                Dashboard.statistical.setTotalProduct(rsCountPro.getInt(1));
+                            }
+                            // lblNewLabel_2_4_1.setText(String.valueOf(statistical.getTotalProduct()));
+                            lblNewLabel_2_4_1.setText("0");
+
+                            Float fakeProfit = 0f;
+                            sql = "select `masanpham`, `soluong` from chitiethd";
+                            ResultSet rsPro = stmt.executeQuery(sql);
+                            while (rsPro.next()) {
+
+                                if (rsPro.getInt(1) > 0 && rsPro.getInt(1) < 31) {
+                                    System.out.println("rsPro:" + rsPro.getInt(1));
+                                    for (DigitalVideoDisc dvd : OnlineSelectionScrollPane.DVDList) {
+                                        if (rsPro.getInt(1) == dvd.getId()) {
+                                            fakeProfit += rsPro.getInt(2) * dvd.getFuns();
+                                            System.out.println(rsPro.getInt(2));
+                                        }
+                                    }
+                                } else {
+                                    if (rsPro.getInt(1) > 30 && rsPro.getInt(1) < 61) {
+
+                                        for (Book book : OnlineSelectionScrollPane.bookList) {
+                                            if (rsPro.getInt(1) == book.getId()) {
+                                                fakeProfit += rsPro.getInt(2) * book.getFuns();
+                                                System.out.println(rsPro.getInt(2));
+                                            }
+                                        }
+                                    } else {
+                                        if (rsPro.getInt(1) > 60) {
+
+                                            for (CompactDisc cd : OnlineSelectionScrollPane.CDList) {
+                                                if (rsPro.getInt(1) == cd.getId()) {
+                                                    fakeProfit += rsPro.getInt(2) * cd.getFuns();
+                                                    System.out.println(rsPro.getInt(2));
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Dashboard.statistical.setTotalProfit(Dashboard.statistical.getTotalCost() - fakeProfit);
+                            // lblNewLabel_2_4_3.setText(String.valueOf(statistical.getTotalProfit()));
+                            lblNewLabel_2_4_3.setText("0");
+
+                        } catch (Exception ex) {
+                            // TODO: handle exception
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Thông tin ngày tháng không hợp lệ !",
+                                "ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+
+                } else {
+                    JOptionPane.showMessageDialog(null, "Thông tin ngày tháng chưa điền đầy đủ !",
+                            "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
         btnNewButton.setBounds(316, 216, 95, 21);
         add(btnNewButton);
 

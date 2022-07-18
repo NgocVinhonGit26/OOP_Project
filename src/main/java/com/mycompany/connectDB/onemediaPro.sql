@@ -86,8 +86,8 @@ create table `hoadon` (
 );
 
 insert into `hoadon` (`id`,`ngaytaodon`,`chietkhau`,`thanhtien`) values 
-	(1,now(),0.15,675000),
-    (2,now(),0.15,300000);
+	(1,"2022-07-15",0.15,573750),
+    (2,"2022-07-15",0.15,255000);
 
 
 create table `chitiethd`(
@@ -103,6 +103,8 @@ insert into `chitietHD` (`idHD`,`masanpham`,`soluong`,`giatri`) values
     (1,2,10,250000),
     (1,31,10,300000),
     (2,31,10,300000);
+    
+select  masanpham, SUM(soluong) from chitiethd  inner join hoadon on chitiethd.idHD  = hoadon.idHD where hoadon.ngaytaodon between "2022-07-15" and "2022-07-18" GROUP BY masanpham ORDER by SUM(soluong) DESC;
 
 create table `chiphikhac`(
 	`idCPK` int auto_increment not null,

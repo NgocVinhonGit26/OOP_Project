@@ -15,6 +15,7 @@ import org.w3c.dom.events.MouseEvent;
 import com.mycompany.connectDB.connectDB;
 
 import java.awt.event.*;
+import java.io.DataOutput;
 import java.net.URL;
 import java.rmi.server.ObjID;
 import java.sql.Connection;
@@ -27,7 +28,7 @@ import com.toedter.calendar.JDateChooser;
 
 public class test extends JPanel {
     private JTable table;
-    connectDB conn;
+    private static connectDB conn;
     LocalDate now = LocalDate.now();
     private String date;
     private float totalValue = 0;
@@ -70,7 +71,7 @@ public class test extends JPanel {
 
         JPanel panel_1 = new JPanel();
         panel_1.setBackground(Color.GREEN);
-        panel_1.setBounds(441, 258, 310, 248);
+        panel_1.setBounds(429, 258, 310, 248);
         add(panel_1);
         panel_1.setLayout(null);
 
@@ -87,7 +88,7 @@ public class test extends JPanel {
 
         JPanel panel_2 = new JPanel();
         panel_2.setBackground(Color.ORANGE);
-        panel_2.setBounds(798, 258, 310, 248);
+        panel_2.setBounds(777, 258, 351, 248);
         add(panel_2);
         panel_2.setLayout(null);
 
@@ -99,12 +100,12 @@ public class test extends JPanel {
         JLabel lblNewLabel_2_4_2 = new JLabel(String.valueOf(statistical.getTotalCost()));
         lblNewLabel_2_4_2.setForeground(Color.WHITE);
         lblNewLabel_2_4_2.setFont(new Font("Tahoma", Font.PLAIN, 60));
-        lblNewLabel_2_4_2.setBounds(28, 50, 272, 95);
+        lblNewLabel_2_4_2.setBounds(28, 50, 313, 95);
         panel_2.add(lblNewLabel_2_4_2);
 
         JPanel panel_3 = new JPanel();
         panel_3.setBackground(new Color(255, 99, 71));
-        panel_3.setBounds(1159, 258, 310, 248);
+        panel_3.setBounds(1159, 258, 345, 248);
         add(panel_3);
         panel_3.setLayout(null);
 
@@ -116,7 +117,7 @@ public class test extends JPanel {
         JLabel lblNewLabel_2_4_3 = new JLabel(String.valueOf(statistical.getTotalProfit()));
         lblNewLabel_2_4_3.setForeground(Color.WHITE);
         lblNewLabel_2_4_3.setFont(new Font("Tahoma", Font.PLAIN, 60));
-        lblNewLabel_2_4_3.setBounds(24, 46, 276, 95);
+        lblNewLabel_2_4_3.setBounds(24, 46, 311, 95);
         panel_3.add(lblNewLabel_2_4_3);
 
         JLabel lblNewLabel_1 = new JLabel("Dashboard\r\n");
@@ -180,9 +181,9 @@ public class test extends JPanel {
         panel_5_2.add(panel_6);
         panel_6.setLayout(null);
 
-        JLabel lblNewLabel_7 = new JLabel("Sản phẩm bán chạy nhất:");
+        JLabel lblNewLabel_7 = new JLabel("Sản phẩm bán chạy nhất");
         lblNewLabel_7.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblNewLabel_7.setBounds(124, 24, 151, 48);
+        lblNewLabel_7.setBounds(104, 24, 211, 48);
         panel_6.add(lblNewLabel_7);
 
         JLabel lblNewLabel_7_2 = new JLabel();
@@ -194,12 +195,12 @@ public class test extends JPanel {
             URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
             lblNewLabel_7_2 = new JLabel("", new ImageIcon(url), JLabel.CENTER);
         }
-        lblNewLabel_7_2.setBounds(27, 10, 84, 62);
+        lblNewLabel_7_2.setBounds(10, 10, 84, 62);
         panel_6.add(lblNewLabel_7_2);
 
-        JLabel lblNewLabel_7_3 = new JLabel("1000");
+        JLabel lblNewLabel_7_3 = new JLabel("0");
         lblNewLabel_7_3.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblNewLabel_7_3.setBounds(285, 24, 84, 48);
+        lblNewLabel_7_3.setBounds(325, 24, 44, 48);
         panel_6.add(lblNewLabel_7_3);
 
         JPanel panel_8 = new JPanel();
@@ -212,9 +213,9 @@ public class test extends JPanel {
         panel_6_2.setBounds(10, 125, 379, 82);
         panel_5_2.add(panel_6_2);
 
-        JLabel lblNewLabel_7_1 = new JLabel("Sản phẩm bán ế nhất:");
+        JLabel lblNewLabel_7_1 = new JLabel("Sản phẩm bán được ít nhất");
         lblNewLabel_7_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblNewLabel_7_1.setBounds(121, 17, 151, 48);
+        lblNewLabel_7_1.setBounds(104, 17, 212, 48);
         panel_6_2.add(lblNewLabel_7_1);
 
         JLabel lblNewLabel_7_2_1 = new JLabel();
@@ -226,12 +227,12 @@ public class test extends JPanel {
             URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("close-icon.png");
             lblNewLabel_7_2_1 = new JLabel("", new ImageIcon(url), JLabel.CENTER);
         }
-        lblNewLabel_7_2_1.setBounds(27, 10, 84, 62);
+        lblNewLabel_7_2_1.setBounds(10, 10, 84, 62);
         panel_6_2.add(lblNewLabel_7_2_1);
 
-        JLabel lblNewLabel_7_3_1 = new JLabel("1000");
+        JLabel lblNewLabel_7_3_1 = new JLabel("0");
         lblNewLabel_7_3_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-        lblNewLabel_7_3_1.setBounds(285, 17, 84, 48);
+        lblNewLabel_7_3_1.setBounds(326, 17, 43, 48);
         panel_6_2.add(lblNewLabel_7_3_1);
 
         JPanel panel_5_1 = new JPanel();
@@ -270,10 +271,6 @@ public class test extends JPanel {
         panel_5_1.add(lblNewLabel_4);
 
         JDateChooser dateChooser = new JDateChooser();
-        dateChooser.getCalendarButton().addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            }
-        });
         dateChooser.setBounds(168, 182, 132, 19);
         add(dateChooser);
 
@@ -292,8 +289,189 @@ public class test extends JPanel {
         add(dateChooser_1);
 
         JButton btnNewButton = new JButton("Thống kê");
-        
+        btnNewButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (dateChooser.getDate() != null && dateChooser_1.getDate() != null) {
+                    java.sql.Date dateFrom = new java.sql.Date(dateChooser.getDate().getTime());
+                    java.sql.Date dateTo = new java.sql.Date(dateChooser_1.getDate().getTime());
+                    java.sql.Date dateNow = new java.sql.Date(System.currentTimeMillis());
+                    if (dateFrom.before(dateTo) && dateTo.before(dateNow) && dateFrom.before(dateNow)) {
+                        System.out.println("he lo");
+                        try {
+                            Connection connect = conn.getConnection();
+                            Statement stmt = connect.createStatement();
+                            String sql = "select COUNT(`idHD`) from hoadon where `thanhtien` > 0 and `ngaytaodon` between ? and ?";
+                            PreparedStatement pr = connect.prepareStatement(sql);
+                            pr.setString(1, String.valueOf(dateFrom));
+                            pr.setString(2, String.valueOf(dateTo));
+                            ResultSet rsCount = pr.executeQuery();
+                            while (rsCount.next()) {
+                                Dashboard.statistical.setTotalOrder(rsCount.getInt(1));
+
+                            }
+                            lblNewLabel_2_4.setText(String.valueOf(statistical.getTotalOrder()));
+                            // lblNewLabel_2_4.setText("0");
+
+                            // Statement stmtSum = connect.createStatement();
+                            sql = "select SUM(`thanhtien`) from hoadon where `thanhtien` > 0 and `ngaytaodon` between ? and ?";
+                            pr = connect.prepareStatement(sql);
+                            pr.setString(1, String.valueOf(dateFrom));
+                            pr.setString(2, String.valueOf(dateTo));
+                            ResultSet rsSum = pr.executeQuery();
+                            while (rsSum.next()) {
+                                Dashboard.statistical.setTotalCost(rsSum.getFloat(1));
+                            }
+                            lblNewLabel_2_4_2.setText(String.valueOf(statistical.getTotalCost()));
+
+                            sql = "select COUNT(DISTINCT(masanpham)) from chitiethd inner join hoadon on chitiethd.idHD  = hoadon.idHD where hoadon.ngaytaodon between ? and ?";
+                            pr = connect.prepareStatement(sql);
+                            pr.setString(1, String.valueOf(dateFrom));
+                            pr.setString(2, String.valueOf(dateTo));
+                            ResultSet rsCountPro = pr.executeQuery();
+                            while (rsCountPro.next()) {
+                                Dashboard.statistical.setTotalProduct(rsCountPro.getInt(1));
+                            }
+                            lblNewLabel_2_4_1.setText(String.valueOf(statistical.getTotalProduct()));
+
+                            Float fakeProfit = 0f;
+                            sql = "select `masanpham`, `soluong` from chitiethd inner join hoadon on chitiethd.idHD  = hoadon.idHD where hoadon.ngaytaodon between ? and ?";
+                            pr = connect.prepareStatement(sql);
+                            pr.setString(1, String.valueOf(dateFrom));
+                            pr.setString(2, String.valueOf(dateTo));
+                            ResultSet rsPro = pr.executeQuery();
+                            while (rsPro.next()) {
+                                if (rsPro.getInt(1) > 0 && rsPro.getInt(1) < 31) {
+                                    System.out.println("rsPro:" + rsPro.getInt(1));
+                                    for (DigitalVideoDisc dvd : OnlineSelectionScrollPane.DVDList) {
+                                        if (rsPro.getInt(1) == dvd.getId()) {
+                                            fakeProfit += rsPro.getInt(2) * dvd.getFuns();
+                                            System.out.println(rsPro.getInt(2));
+                                        }
+                                    }
+                                } else {
+                                    if (rsPro.getInt(1) > 30 && rsPro.getInt(1) < 61) {
+
+                                        for (Book book : OnlineSelectionScrollPane.bookList) {
+                                            if (rsPro.getInt(1) == book.getId()) {
+                                                fakeProfit += rsPro.getInt(2) * book.getFuns();
+                                                System.out.println(rsPro.getInt(2));
+                                            }
+                                        }
+                                    } else {
+                                        if (rsPro.getInt(1) > 60) {
+
+                                            for (CompactDisc cd : OnlineSelectionScrollPane.CDList) {
+                                                if (rsPro.getInt(1) == cd.getId()) {
+                                                    fakeProfit += rsPro.getInt(2) * cd.getFuns();
+                                                    System.out.println(rsPro.getInt(2));
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            System.out.println("fakeProfit" + fakeProfit + " " + "getTotalCost"
+                                    + Dashboard.statistical.getTotalCost());
+                            Double doubleProfit = (Math
+                                    .round((Dashboard.statistical.getTotalCost() - fakeProfit) * 100.0) / 100.0);
+                            Dashboard.statistical.setTotalProfit(doubleProfit.floatValue());
+                            lblNewLabel_2_4_3.setText(String.valueOf(statistical.getTotalProfit()));
+                            // lblNewLabel_2_4_3.setText("0");
+
+                            sql = "select  masanpham, SUM(soluong) from chitiethd  inner join hoadon on chitiethd.idHD  = hoadon.idHD where hoadon.ngaytaodon between ? and ? GROUP BY masanpham ORDER by SUM(soluong) DESC;";
+                            pr = connect.prepareStatement(sql);
+                            pr.setString(1, String.valueOf(dateFrom));
+                            pr.setString(2, String.valueOf(dateTo));
+                            ResultSet rsBestseller = pr.executeQuery();
+                            int maxQuantity = 0;
+                            int maxIdProduct = 0;
+                            while (rsBestseller.next()) {
+                                if (maxQuantity < rsBestseller.getInt(2)) {
+                                    maxQuantity = rsBestseller.getInt(2);
+                                    maxIdProduct = rsBestseller.getInt(1);
+                                }
+                            }
+                            lblNewLabel_7_3.setText(String.valueOf(maxQuantity));
+                            if (maxIdProduct > 0 && maxIdProduct < 31) {
+                                for (DigitalVideoDisc dvd : OnlineSelectionScrollPane.DVDList) {
+                                    if (dvd.getId() == maxIdProduct) {
+                                        lblNewLabel_7.setText(String.valueOf(dvd.getTitle()));
+                                    }
+                                }
+                            } else {
+                                if (maxIdProduct > 30 && maxIdProduct < 61) {
+                                    for (Book book : OnlineSelectionScrollPane.bookList) {
+                                        if (book.getId() == maxIdProduct) {
+                                            lblNewLabel_7.setText(String.valueOf(book.getTitle()));
+                                        }
+                                    }
+                                } else {
+                                    if (maxIdProduct > 60) {
+                                        for (CompactDisc cd : OnlineSelectionScrollPane.CDList) {
+                                            if (cd.getId() == maxIdProduct) {
+                                                lblNewLabel_7.setText(String.valueOf(cd.getTitle()));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            sql = "select  masanpham, MAX(soluong) from chitiethd  inner join hoadon on chitiethd.idHD  = hoadon.idHD where hoadon.ngaytaodon between ? and ? GROUP BY masanpham ORDER by SUM(soluong) DESC;";
+                            pr = connect.prepareStatement(sql);
+                            pr.setString(1, String.valueOf(dateFrom));
+                            pr.setString(2, String.valueOf(dateTo));
+                            ResultSet rsBadseller = pr.executeQuery();
+                            int minQuantity = 1000;
+                            int minIdProduct = 0;
+                            while (rsBadseller.next()) {
+                                System.out.println("rsBadseller" + rsBadseller.getInt(2));
+                                if (minQuantity > rsBadseller.getInt(2)) {
+                                    minQuantity = rsBadseller.getInt(2);
+                                    minIdProduct = rsBadseller.getInt(1);
+                                }
+                            }
+                            lblNewLabel_7_3_1.setText(String.valueOf(minQuantity));
+                            if (minIdProduct > 0 && minIdProduct < 31) {
+                                for (DigitalVideoDisc dvd : OnlineSelectionScrollPane.DVDList) {
+                                    if (dvd.getId() == minIdProduct) {
+                                        lblNewLabel_7_1.setText(String.valueOf(dvd.getTitle()));
+                                    }
+                                }
+                            } else {
+                                if (minIdProduct > 30 && minIdProduct < 61) {
+                                    for (Book book : OnlineSelectionScrollPane.bookList) {
+                                        if (book.getId() == minIdProduct) {
+                                            lblNewLabel_7_1.setText(String.valueOf(book.getTitle()));
+                                        }
+                                    }
+                                } else {
+                                    if (minIdProduct > 60) {
+                                        for (CompactDisc cd : OnlineSelectionScrollPane.CDList) {
+                                            if (cd.getId() == minIdProduct) {
+                                                lblNewLabel_7_1.setText(String.valueOf(cd.getTitle()));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        } catch (Exception ex) {
+                            // TODO: handle exception
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Thông tin ngày tháng không hợp lệ !",
+                                "ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+
+                } else {
+                    JOptionPane.showMessageDialog(null, "Thông tin ngày tháng chưa điền đầy đủ !",
+                            "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
         btnNewButton.setBounds(316, 216, 95, 21);
+
         add(btnNewButton);
 
         btnBack.addActionListener(new ActionListener() {

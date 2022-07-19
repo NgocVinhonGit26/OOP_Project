@@ -28,7 +28,8 @@ public class DetailCD {
 
     private static connectDB conn;
 
-    public DetailCD(int id, String title, String imageAddress, String director, int length, Float cost, int quantity,
+    public DetailCD(JPanel panelParent, JPanel panelCurrent, int id, String title, String imageAddress, String director,
+            int length, Float cost, int quantity,
             String artist, List<Track> trackList) {
 
         JFrame detailFrame = new JFrame(title);
@@ -140,6 +141,22 @@ public class DetailCD {
                                 stmt.setInt(2, id);
                                 stmt.executeUpdate();
                                 stmt.close();
+
+                                for (CompactDisc cd : OnlineSelectionScrollPane.CDList) {
+                                    if (cd.getId() == id) {
+                                        cd.setQuantity(quantity - qtt);
+                                        JPanel subSubPanel = OnlineSelectionScrollPane.addProductCD(id, cd.getTitle(),
+                                                cd.getImage(), cd.getDirector(), cd.getLength(), cd.getCost(),
+                                                quantity - qtt, cd.getArtist(), cd.getTrackList());
+                                        panelParent.add(subSubPanel);
+                                        panelParent.validate();
+                                        panelParent.repaint();
+                                        // JPanel parentPanel = (JPanel) panel.getComponent(1);
+                                        panelParent.remove(panelCurrent);
+                                        panelParent.validate();
+                                        panelParent.repaint();
+                                    }
+                                }
 
                                 // Item tempItem = new Item();
                                 // tempItem.setQuantity(quantity - qtt);

@@ -18,7 +18,8 @@ public class DetailDVD {
 
     connectDB conn;
 
-    public DetailDVD(int id, String title, String imageAddress, Float cost, int quantity, int length, String director,
+    public DetailDVD(JPanel panelParent, JPanel panelCurrent, int id, String title, String imageAddress, Float cost,
+            int quantity, int length, String director,
             String producer) {
 
         JFrame detailFrame = new JFrame(title);
@@ -119,6 +120,22 @@ public class DetailDVD {
                                 stmt.setInt(2, id);
                                 stmt.executeUpdate();
                                 stmt.close();
+
+                                for (DigitalVideoDisc dvd : OnlineSelectionScrollPane.DVDList) {
+                                    if (dvd.getId() == id) {
+                                        dvd.setQuantity(quantity - qtt);
+                                        JPanel subSubPanel = OnlineSelectionScrollPane.addProductDVD(id, dvd.getTitle(),
+                                                dvd.getImage(), dvd.getCost(), quantity - qtt, dvd.getLength(),
+                                                dvd.getDirector(), dvd.getProducer());
+                                        panelParent.add(subSubPanel);
+                                        panelParent.validate();
+                                        panelParent.repaint();
+                                        // JPanel parentPanel = (JPanel) panel.getComponent(1);
+                                        panelParent.remove(panelCurrent);
+                                        panelParent.validate();
+                                        panelParent.repaint();
+                                    }
+                                }
 
                                 // Item tempItem = new Item();
                                 // tempItem.setQuantity(quantity - qtt);

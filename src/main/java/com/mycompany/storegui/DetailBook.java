@@ -18,7 +18,9 @@ import java.util.List;
 public class DetailBook {
     connectDB conn;
 
-    public DetailBook(int id, String title, String imageAddress, Float cost, int quantity, List<String> authors,
+    public DetailBook(JPanel panelParent, JPanel panelCurrent, int id, String title, String imageAddress, Float cost,
+            int quantity,
+            List<String> authors,
             String publisher, String category) {
 
         JFrame detailFrame = new JFrame(title);
@@ -126,6 +128,24 @@ public class DetailBook {
                                 stmt.setInt(2, id);
                                 stmt.executeUpdate();
                                 stmt.close();
+
+                                for (Book book : OnlineSelectionScrollPane.bookList) {
+                                    if (book.getId() == id) {
+                                        book.setQuantity(quantity - qtt);
+                                        JPanel subSubPanel = OnlineSelectionScrollPane
+                                                .addProductBook(id,
+                                                        book.getTitle(), book.getImage(), book.getCost(),
+                                                        quantity - qtt, book.getAuthors(), book.getPublisher(),
+                                                        book.getCategory());
+                                        panelParent.add(subSubPanel);
+                                        panelParent.validate();
+                                        panelParent.repaint();
+                                        // JPanel parentPanel = (JPanel) panel.getComponent(1);
+                                        panelParent.remove(panelCurrent);
+                                        panelParent.validate();
+                                        panelParent.repaint();
+                                    }
+                                }
 
                                 // Item tempItem = new Item();
                                 // tempItem.setQuantity(quantity - qtt);

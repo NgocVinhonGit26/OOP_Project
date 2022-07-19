@@ -607,7 +607,8 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
                 } else { // if not admin access
 
-                    DetailDVD detail = new DetailDVD(1, productName, imageAddress, cost, quantity, 1, "vinh", "vinh");
+                    // DetailDVD detail = new DetailDVD(1, productName, imageAddress, cost,
+                    // quantity, 1, "vinh", "vinh");
                     // test detail = new test(productName, imageAddress, cost, quantity);
                 }
             }
@@ -739,7 +740,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                                                             break;
                                                         }
                                                     }
-                                                    int length = Integer.parseInt(lengthText);
+                                                    int lengthU = Integer.parseInt(lengthText);
                                                     String category = JOptionPane.showInputDialog("Nhập thể loại phim",
                                                             rs.getString(6));
                                                     if (!category.isBlank()) {
@@ -758,7 +759,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                                                                 break;
                                                             }
                                                         }
-                                                        int quantity = Integer.parseInt(quantityText);
+                                                        int quantityU = Integer.parseInt(quantityText);
 
                                                         String imageAddress = JOptionPane
                                                                 .showInputDialog("Nhập địa chỉ hình ảnh",
@@ -804,15 +805,42 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                                                                 ps.setString(1, productName);
                                                                 ps.setString(2, producerName);
                                                                 ps.setString(3, directorName);
-                                                                ps.setInt(4, length);
+                                                                ps.setInt(4, lengthU);
                                                                 ps.setString(5, category);
-                                                                ps.setInt(6, quantity);
+                                                                ps.setInt(6, quantityU);
                                                                 ps.setFloat(7, funds);
                                                                 ps.setFloat(8, cost);
                                                                 ps.setString(9, imageAddress);
                                                                 ps.setInt(10, id);
                                                                 ps.executeUpdate();
                                                                 ps.close();
+                                                                for (DigitalVideoDisc dvd : DVDList) {
+                                                                    if (dvd.getId() == id) {
+                                                                        dvd.setTitle(producerName);
+                                                                        dvd.setProducer(productName);
+                                                                        dvd.setDirector(directorName);
+                                                                        dvd.setLength(lengthU);
+                                                                        dvd.setCategory(category);
+                                                                        dvd.setQuantity(quantityU);
+                                                                        dvd.setFuns(funds);
+                                                                        dvd.setCost(cost);
+                                                                        dvd.setImage(imageAddress);
+                                                                    }
+                                                                }
+                                                                JPanel subPanel = (JPanel) panel.getParent();
+                                                                JPanel subSubPanel = OnlineSelectionScrollPane
+                                                                        .addProductDVD(id, productName,
+                                                                                imageAddress,
+                                                                                cost, quantityU, lengthU,
+                                                                                directorName,
+                                                                                producerName);
+                                                                subPanel.add(subSubPanel);
+                                                                subPanel.validate();
+                                                                subPanel.repaint();
+                                                                JPanel parentPanel = (JPanel) panel.getParent();
+                                                                parentPanel.remove(panel);
+                                                                parentPanel.validate();
+                                                                parentPanel.repaint();
 
                                                             } catch (ArrayIndexOutOfBoundsException ex) {
 
@@ -858,9 +886,9 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                         }
 
                     } else { // if not admin access
-
-                        DetailDVD detail = new DetailDVD(id, title, imageAddress, cost, quantity, length, director,
-                                producer);
+                        JPanel subPanel = (JPanel) panel.getParent();
+                        DetailDVD detail = new DetailDVD(subPanel, panel, id, title, imageAddress, cost, quantity,
+                                length, director, producer);
                         // test detail = new test(productName, imageAddress, cost, quantity);
                     }
                 }
@@ -1051,6 +1079,31 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                                                                 ps.executeUpdate();
                                                                 ps.close();
 
+                                                                for (Book book : bookList) {
+                                                                    if (book.getId() == id) {
+                                                                        book.setTitle(productName);
+                                                                        book.setPublisher(producerName);
+                                                                        book.setAuthors(author);
+                                                                        book.setCategory(category);
+                                                                        book.setQuantity(quantity);
+                                                                        book.setFuns(funds);
+                                                                        book.setCost(cost);
+                                                                        book.setImage(imageAddress);
+                                                                    }
+                                                                }
+                                                                JPanel subPanel = (JPanel) panel.getParent();
+                                                                JPanel subSubPanel = OnlineSelectionScrollPane
+                                                                        .addProductBook(id,
+                                                                                productName, imageAddress, cost,
+                                                                                quantity, author, producerName,
+                                                                                category);
+                                                                subPanel.add(subSubPanel);
+                                                                subPanel.validate();
+                                                                subPanel.repaint();
+                                                                JPanel parentPanel = (JPanel) panel.getParent();
+                                                                parentPanel.remove(panel);
+                                                                parentPanel.validate();
+                                                                parentPanel.repaint();
                                                             } catch (ArrayIndexOutOfBoundsException ex) {
 
                                                             }
@@ -1095,9 +1148,11 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                         }
 
                     } else { // if not admin access
+                        JPanel subPanel = (JPanel) panel.getParent();
 
-                        DetailBook detail = new DetailBook(id, title, imageAddress, cost, quantity, authors, publisher,
-                                category);
+                        DetailBook detail = new DetailBook(subPanel, panel, id, title, imageAddress, cost, quantity,
+                                authors,
+                                publisher, category);
                         // test detail = new test(productName, imageAddress, cost, quantity);
                     }
                 }
@@ -1303,6 +1358,33 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                                                                 ps.executeUpdate();
                                                                 ps.close();
 
+                                                                for (CompactDisc cd : CDList) {
+                                                                    if (cd.getId() == id) {
+                                                                        cd.setTitle(productName);
+                                                                        cd.setDirector(productName);
+                                                                        cd.setArtist(director);
+                                                                        cd.setLength(length);
+                                                                        cd.setCategory(category);
+                                                                        cd.setQuantity(quantity);
+                                                                        cd.setFuns(funds);
+                                                                        cd.setCost(cost);
+                                                                        cd.setImage(imageAddress);
+                                                                    }
+                                                                }
+                                                                JPanel subPanel = (JPanel) panel.getParent();
+                                                                JPanel subSubPanel = OnlineSelectionScrollPane
+                                                                        .addProductCD(id, productName,
+                                                                                imageAddress, producerName, length,
+                                                                                cost, quantity, directorName,
+                                                                                trackList);
+                                                                subPanel.add(subSubPanel);
+                                                                subPanel.validate();
+                                                                subPanel.repaint();
+                                                                JPanel parentPanel = (JPanel) panel.getParent();
+                                                                parentPanel.remove(panel);
+                                                                parentPanel.validate();
+                                                                parentPanel.repaint();
+
                                                             } catch (ArrayIndexOutOfBoundsException ex) {
 
                                                             }
@@ -1346,9 +1428,9 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
                         }
 
                     } else { // if not admin access
-
-                        DetailCD detail = new DetailCD(id, title, imageAddress, director, length, cost, quantity,
-                                artist, trackList);
+                        JPanel subPanel = (JPanel) panel.getParent();
+                        DetailCD detail = new DetailCD(subPanel, panel, id, title, imageAddress, director, length, cost,
+                                quantity, artist, trackList);
                     }
                 }
 

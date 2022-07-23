@@ -45,7 +45,7 @@ public class OnlineBuyCartPanel extends JPanel {
                 addComponent(totalLabel, 1, 0, 2, 1);
 
                 gbc.insets = new Insets(0, 0, 5, 5);
-                addComponent(new JLabel("Name: "), 0, 1, 1, 1);
+                addComponent(new JLabel("Họ tên: "), 0, 1, 1, 1);
 
                 // JTextField nameField = new
                 // JTextField(OnlineRegistrationPanel.CUSTOMERS.get(loginedEmail).getName(),
@@ -58,7 +58,7 @@ public class OnlineBuyCartPanel extends JPanel {
                 JTextField mobileField = new JTextField("" + rs.getString(5), 20);
                 addComponent(mobileField, 3, 1, 1, 1);
 
-                addComponent(new JLabel("Đại chỉ: "), 0, 2, 1, 1);
+                addComponent(new JLabel("Địa chỉ: "), 0, 2, 1, 1);
 
                 gbc.insets = new Insets(0, 0, 5, 5);
                 addComponent(new JLabel("Card Number: "), 0, 3, 1, 1);

@@ -1,5 +1,5 @@
-create database onemediapro;
-use onemediapro;
+create database onemediafake;
+use onemediafake;
 
 create table `user` (
 	`id` int not null auto_increment,
@@ -92,9 +92,13 @@ insert into `hoadon` (`id`,`ngaytaodon`,`chietkhau`,`thanhtien`) values
 
 create table `chitiethd`(
 	`idHD` int not null,
+    `tensanpham` varchar(45),
 	`masanpham` int,
     `soluong` int not null,
     `giatri` double not null,
+    foreign key (masanpham) references `sach`(masanpham),
+    -- foreign key (masanpham) references `masanpham`,``(diaphim),
+--     foreign key (masanpham) references `masanpham`(dianhac),
     foreign key (idHD) references `hoadon`(idHD)
 );
 
@@ -104,18 +108,12 @@ insert into `chitietHD` (`idHD`,`masanpham`,`soluong`,`giatri`) values
     (1,31,10,300000),
     (2,31,10,300000);
     
-select  masanpham, SUM(soluong) from chitiethd  inner join hoadon on chitiethd.idHD  = hoadon.idHD where hoadon.ngaytaodon between "2022-07-15" and "2022-07-22" GROUP BY masanpham ORDER by SUM(soluong) DESC;
+select  masanpham, SUM(soluong) from chitiethd  inner join hoadon on chitiethd.idHD  = hoadon.idHD where hoadon.ngaytaodon between "2022-07-15" and "2022-07-18" GROUP BY masanpham ORDER by SUM(soluong) DESC;
 
 create table `chiphikhac`(
 	`idCPK` int auto_increment not null,
     `tenchiphi` varchar(255) not null,
     `chiphi` double not null,
-    `thoigiantao` date,
+    `thoigiantao` datetime,
     constraint PK_CPK primary key(idCPK)
 );
-
-insert into chiphikhac (`tenchiphi`,`chiphi`, `thoigiantao`) values
-	("Cai tao he thong", 10 , "2022-07-15");
-    
---      delete from chiphikhac where idCPK = 5;
-

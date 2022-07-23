@@ -16,4 +16,12 @@ public class DigitalVideoDisc extends Disc {
 		super(id, title, category, director, length, funs, cost, quantity, image);
 		this.producer = producer;
 	}
+
+	@Override
+	public int compareTo(Object o) {
+		if (o instanceof DigitalVideoDisc) {
+			return this.getTitle().compareToIgnoreCase(((DigitalVideoDisc) o).getTitle());
+		}
+		return -9999;
+	}
 }

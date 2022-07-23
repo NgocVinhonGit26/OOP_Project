@@ -1,13 +1,13 @@
 package com.mycompany.storegui;
 
 public abstract class Media {
-	protected int id;
-	protected String title;
-	protected String category;
-	protected float funs;
-	protected float cost;
-	protected int quantity;
-	protected String image;
+	private int id;
+	private String title;
+	private String category;
+	private float funs;
+	private float cost;
+	private int quantity;
+	private String image;
 
 	public Media(int id, String title, String category, float funs, float cost, int quantity, String image) {
 		this.id = id;
@@ -73,6 +73,13 @@ public abstract class Media {
 
 	public void setImage(String image) {
 		this.image = image;
+	}
+
+	public int compareTo(Object o) {
+		if (o instanceof Media) {
+			return this.getTitle().compareToIgnoreCase(((Media) o).getTitle());
+		}
+		return -9999;
 	}
 
 }

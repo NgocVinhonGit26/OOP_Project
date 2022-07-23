@@ -31,16 +31,15 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
     public static final ArrayList<DigitalVideoDisc> DVDList = new ArrayList<>();
     public static final ArrayList<Book> bookList = new ArrayList<>();
     public static final ArrayList<CompactDisc> CDList = new ArrayList<>();
+    public static final ArrayList<Track> trackList = new ArrayList<>();
     private static final HashMap<JPanel, JLabel> UNDER_EDITING_PANELS = new HashMap<>();
     private static connectDB conn;
 
     static {
 
         // make 3 categories
-        addCategoryDVD.addCategory("DVD", "dvd.png", UNDER_EDITING_PANELS,
-                CATEGORIES);
-        addCategoryBook.addCategory("Book", "book.png", UNDER_EDITING_PANELS,
-                CATEGORIES);
+        addCategoryDVD.addCategory("DVD", "dvd.png", UNDER_EDITING_PANELS, CATEGORIES);
+        addCategoryBook.addCategory("Book", "book.png", UNDER_EDITING_PANELS, CATEGORIES);
         addCategoryCD.addCategory("CD", "cd.png", UNDER_EDITING_PANELS, CATEGORIES);
         // addCategory("DVD", "dvd.png");
         // addCategory("Book", "book.png");
@@ -75,6 +74,11 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
             // TODO: handle exception
         }
 
+        Track track1 = new Track("Hello", 40);
+        Track track2 = new Track("What do you mean", 50);
+        Track track3 = new Track("Day by day", 50);
+        Track track4 = new Track("Arigatou", 10);
+        Collections.addAll(trackList, track1, track2, track3, track4);
         try {
             Connection connect = conn.getConnection();
             Statement stmt = connect.createStatement();
@@ -84,7 +88,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
 
                 CompactDisc cd = new CompactDisc(rs.getInt(1), rs.getString(2),
                         rs.getString(6), rs.getString(4), rs.getInt(5), rs.getFloat(8), rs.getFloat(9), rs.getInt(7),
-                        rs.getString(10), rs.getString(3));
+                        rs.getString(10), rs.getString(3), trackList);
                 Collections.addAll(CDList, cd);
             }
         } catch (Exception e) {
@@ -94,7 +98,7 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         // add products to first category
         JPanel panel = new JPanel();
         for (DigitalVideoDisc dvd : DVDList) {
-            panel.add(addProductDVD(dvd.id, dvd.title, dvd.image, dvd.cost, dvd.quantity,
+            panel.add(addProductDVD(dvd.getId(), dvd.getTitle(), dvd.getImage(), dvd.getCost(), dvd.getQuantity(),
                     dvd.length, dvd.director, dvd.getProducer()));
         }
         CATEGORIES.get("DVD").add(panel);
@@ -102,16 +106,16 @@ public final class OnlineSelectionScrollPane extends JScrollPane {
         // add products to second category
         panel = new JPanel();
         for (Book book : bookList) {
-            panel.add(addProductBook(book.id, book.title, book.image, book.cost,
-                    book.quantity, book.getAuthors(), book.getPublisher(), book.category));
+            panel.add(addProductBook(book.getId(), book.getTitle(), book.getImage(), book.getCost(),
+                    book.getQuantity(), book.getAuthors(), book.getPublisher(), book.getCategory()));
         }
         CATEGORIES.get("Book").add(panel);
 
         // add products to third category
         panel = new JPanel();
         for (CompactDisc cd : CDList) {
-            panel.add(addProductCD(cd.id, cd.title, cd.image, cd.getArtist(), cd.length,
-                    cd.cost, cd.quantity, cd.getDirector(), cd.getTrackList()));
+            panel.add(addProductCD(cd.getId(), cd.getTitle(), cd.getImage(), cd.getArtist(), cd.length,
+                    cd.getCost(), cd.getQuantity(), cd.getDirector(), cd.getTrackList()));
         }
         CATEGORIES.get("CD").add(panel);
 

@@ -20,4 +20,8 @@ public class Track {
         this.length = length;
     }
 
+    public Track(String title, int length) {
+        this.title = title;
+        this.length = length;
+    }
 }

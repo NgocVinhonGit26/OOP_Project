@@ -24,10 +24,10 @@ public class CompactDisc extends Disc {
 	}
 
 	public CompactDisc(int id, String title, String category, String director, int length, float funds, float cost,
-			int quantity,
-			String image, String artist) {
+			int quantity, String image, String artist, List<Track> trackList) {
 		super(id, title, category, director, length, funds, cost, quantity, image);
 		this.artist = artist;
+		this.trackList = trackList;
 	}
 
 	public void addTrack(Track track) {
@@ -36,5 +36,13 @@ public class CompactDisc extends Disc {
 		} else {
 			trackList.add(track);
 		}
+	}
+
+	@Override
+	public int compareTo(Object o) {
+		if (o instanceof CompactDisc) {
+			return this.getTitle().compareToIgnoreCase(((CompactDisc) o).getTitle());
+		}
+		return -9999;
 	}
 }

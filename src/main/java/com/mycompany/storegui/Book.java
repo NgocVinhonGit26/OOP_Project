@@ -36,4 +36,12 @@ public class Book extends Media {
         addAuthor(authors);
         this.publisher = publisher;
     }
+
+    @Override
+    public int compareTo(Object o) {
+        if (o instanceof Book) {
+            return this.getTitle().compareToIgnoreCase(((Book) o).getTitle());
+        }
+        return -9999;
+    }
 }

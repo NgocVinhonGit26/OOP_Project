@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -29,8 +30,7 @@ public class DetailCD {
     private static connectDB conn;
 
     public DetailCD(JPanel panelParent, JPanel panelCurrent, int id, String title, String imageAddress, String director,
-            int length, Float cost, int quantity,
-            String artist, List<Track> trackList) {
+            int length, Float cost, int quantity, String artist, List<Track> trackList) {
 
         JFrame detailFrame = new JFrame(title);
         detailFrame.setSize(500, 500);
@@ -58,8 +58,11 @@ public class DetailCD {
         String lengthText = "Độ dài: " + length;
         String artistText = "Nghệ sĩ: " + artist;
         String trackText = "Track:";
+        List<String> list = new ArrayList<>();
+        int i = 0;
         for (Track track : trackList) {
-            trackText += (" " + track.getTitle() + " " + track.getLength());
+            trackText += (" " + track.getTitle() + " " + track.getLength() + " ");
+            // list.add(" " + track.getTitle() + " " + track.getLength());
         }
 
         panel.setBorder(BorderFactory.createEtchedBorder(Color.lightGray, Color.black));
@@ -100,7 +103,7 @@ public class DetailCD {
         panel.add(artistLabel);
 
         JLabel trackLabel = new JLabel(trackText);
-        trackLabel.setBounds(157, 293, 265, 20);
+        trackLabel.setBounds(157, 293, 308, 54);
         panel.add(trackLabel);
 
         JButton btnBuy = new JButton("Mua");
@@ -179,6 +182,7 @@ public class DetailCD {
             }
         });
         panel.add(btnBuy);
+
         detailFrame.setVisible(true);
     }
 }

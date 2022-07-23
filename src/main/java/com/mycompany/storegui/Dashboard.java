@@ -25,6 +25,7 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import com.toedter.calendar.JMonthChooser;
 import com.toedter.calendar.JDateChooser;
+import javax.swing.JComponent;
 
 public class Dashboard extends JPanel {
     private JTable table;
@@ -35,6 +36,8 @@ public class Dashboard extends JPanel {
     private float totalCost = 0;
     public static float chietkhau;
     public static Statistical statistical = new Statistical();
+    MouseAdapter mouseLocal1;
+    MouseAdapter mouseLocal2;
 
     public Dashboard() {
         setLayout(null);
@@ -53,7 +56,7 @@ public class Dashboard extends JPanel {
         add(btnsPanel);
 
         JPanel panel = new JPanel();
-        panel.setBackground(Color.CYAN);
+        panel.setBackground(new Color(173, 255, 47));
         panel.setBounds(91, 258, 310, 248);
         add(panel);
         panel.setLayout(null);
@@ -70,7 +73,7 @@ public class Dashboard extends JPanel {
         panel.add(lblNewLabel_2_4);
 
         JPanel panel_1 = new JPanel();
-        panel_1.setBackground(Color.GREEN);
+        panel_1.setBackground(new Color(255, 99, 71));
         panel_1.setBounds(429, 258, 310, 248);
         add(panel_1);
         panel_1.setLayout(null);
@@ -87,7 +90,7 @@ public class Dashboard extends JPanel {
         panel_1.add(lblNewLabel_2_4_1);
 
         JPanel panel_2 = new JPanel();
-        panel_2.setBackground(Color.ORANGE);
+        panel_2.setBackground(new Color(147, 112, 219));
         panel_2.setBounds(777, 258, 351, 248);
         add(panel_2);
         panel_2.setLayout(null);
@@ -104,7 +107,7 @@ public class Dashboard extends JPanel {
         panel_2.add(lblNewLabel_2_4_2);
 
         JPanel panel_3 = new JPanel();
-        panel_3.setBackground(new Color(255, 99, 71));
+        panel_3.setBackground(Color.ORANGE);
         panel_3.setBounds(1159, 258, 345, 248);
         add(panel_3);
         panel_3.setLayout(null);
@@ -136,6 +139,16 @@ public class Dashboard extends JPanel {
         add(lblNewLabel_3);
 
         JPanel panel_5 = new JPanel();
+        panel_5.addMouseListener(new MouseAdapter() {
+            // @Override
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                // TODO Auto-generated method stub
+                super.mouseClicked(e);
+                System.out.println("vinh dep trai");
+            }
+
+        });
         panel_5.setBackground(Color.WHITE);
         panel_5.setBounds(253, 584, 498, 95);
         add(panel_5);
@@ -213,14 +226,14 @@ public class Dashboard extends JPanel {
         panel_6_2.setBounds(10, 125, 379, 82);
         panel_5_2.add(panel_6_2);
 
-        JLabel lblNewLabel_7_1 = new JLabel("Sản phẩm bán được ít nhất");
+        JLabel lblNewLabel_7_1 = new JLabel("Chi phí phát sinh");
         lblNewLabel_7_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
         lblNewLabel_7_1.setBounds(104, 17, 212, 48);
         panel_6_2.add(lblNewLabel_7_1);
 
         JLabel lblNewLabel_7_2_1 = new JLabel();
         try {
-            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("tonkho.png");
+            URL url = OnlineSelectionScrollPane.class.getClassLoader().getResource("cpps.png");
             lblNewLabel_7_2_1 = new JLabel(new ImageIcon(url), JLabel.CENTER);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Image not found", "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -298,7 +311,39 @@ public class Dashboard extends JPanel {
                     java.sql.Date dateNow = new java.sql.Date(System.currentTimeMillis());
                     if (dateFrom.before(dateTo) && dateTo.before(dateNow) && dateFrom.before(dateNow)) {
                         System.out.println("he lo");
+
                         try {
+                            panel_6.removeMouseListener(mouseLocal1);
+                            panel_6_2.removeMouseListener(mouseLocal2);
+                            MouseAdapter mouse1 = new MouseAdapter() {
+                                // @Override
+                                @Override
+                                public void mouseClicked(java.awt.event.MouseEvent e) {
+                                    // TODO Auto-generated method stub
+                                    super.mouseClicked(e);
+
+                                    System.out.println("panel6");
+                                    DetailHotdeal hotdeal = new DetailHotdeal(dateFrom, dateTo);
+
+                                }
+                            };
+                            panel_6.addMouseListener(mouse1);
+                            mouseLocal1 = mouse1;
+
+                            MouseAdapter mouse2 = new MouseAdapter() {
+                                // @Override
+                                @Override
+                                public void mouseClicked(java.awt.event.MouseEvent e) {
+                                    // TODO Auto-generated method stub
+                                    super.mouseClicked(e);
+                                    System.out.println("panel6_2");
+                                    CostsIncurred costsIncurred = new CostsIncurred(dateFrom, dateTo);
+                                }
+
+                            };
+                            panel_6_2.addMouseListener(mouse2);
+                            mouseLocal2 = mouse2;
+
                             Connection connect = conn.getConnection();
                             Statement stmt = connect.createStatement();
                             String sql = "select COUNT(`idHD`) from hoadon where `thanhtien` > 0 and `ngaytaodon` between ? and ?";
@@ -417,48 +462,18 @@ public class Dashboard extends JPanel {
                                 }
                             }
 
-                            sql = "select  masanpham, MAX(soluong) from chitiethd  inner join hoadon on chitiethd.idHD  = hoadon.idHD where hoadon.ngaytaodon between ? and ? GROUP BY masanpham ORDER by SUM(soluong) DESC;";
+                            sql = "select SUM(`chiphi`) from chiphikhac where `thoigiantao` between ? and ?";
                             pr = connect.prepareStatement(sql);
                             pr.setString(1, String.valueOf(dateFrom));
                             pr.setString(2, String.valueOf(dateTo));
-                            ResultSet rsBadseller = pr.executeQuery();
-                            int minQuantity = 1000;
-                            int minIdProduct = 0;
-                            while (rsBadseller.next()) {
-                                System.out.println("rsBadseller" + rsBadseller.getInt(2));
-                                if (minQuantity > rsBadseller.getInt(2)) {
-                                    minQuantity = rsBadseller.getInt(2);
-                                    minIdProduct = rsBadseller.getInt(1);
-                                }
+                            ResultSet rsSumcost = pr.executeQuery();
+                            while (rsSumcost.next()) {
+                                lblNewLabel_7_3_1.setText(String.valueOf(rsSumcost.getFloat(1)));
                             }
-                            lblNewLabel_7_3_1.setText(String.valueOf(minQuantity));
-                            if (minIdProduct > 0 && minIdProduct < 31) {
-                                for (DigitalVideoDisc dvd : OnlineSelectionScrollPane.DVDList) {
-                                    if (dvd.getId() == minIdProduct) {
-                                        lblNewLabel_7_1.setText(String.valueOf(dvd.getTitle()));
-                                    }
-                                }
-                            } else {
-                                if (minIdProduct > 30 && minIdProduct < 61) {
-                                    for (Book book : OnlineSelectionScrollPane.bookList) {
-                                        if (book.getId() == minIdProduct) {
-                                            lblNewLabel_7_1.setText(String.valueOf(book.getTitle()));
-                                        }
-                                    }
-                                } else {
-                                    if (minIdProduct > 60) {
-                                        for (CompactDisc cd : OnlineSelectionScrollPane.CDList) {
-                                            if (cd.getId() == minIdProduct) {
-                                                lblNewLabel_7_1.setText(String.valueOf(cd.getTitle()));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
                         } catch (Exception ex) {
                             // TODO: handle exception
                         }
+
                     } else {
                         JOptionPane.showMessageDialog(null, "Thông tin ngày tháng không hợp lệ !",
                                 "ERROR", JOptionPane.ERROR_MESSAGE);
